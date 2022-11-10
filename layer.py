@@ -24,6 +24,7 @@ class Layer:
         
     def predict(self, layer_input):
         # Gets output of hidden layer based on layer_input
+        #self.layer_input = layer_input
         output = []
         
         if self.bias:
@@ -37,6 +38,12 @@ class Layer:
         
         #return [perc.predict(np.dot(w_row, layer_input)) for w_row, perc in zip(weight_matrix, perceptron_list)]        
         
+    def forward(self):
+        return
+    
+    def backward(self):
+        return
+    
     def build_percepton_list(self, num_perceptrons, num_inputs):
         return [perceptron.Perceptron(size = num_inputs) for i in range(num_perceptrons)]
         
