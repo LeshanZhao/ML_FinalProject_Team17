@@ -13,7 +13,7 @@ class Layer:
     def __init__(self, num_perceptrons, num_inputs, include_bias = False, weights = None):
         self.bias = include_bias
         
-        self.perceptron_list = build_percepton_list(num_perceptrons, num_inputs)
+        self.perceptron_list = self.build_percepton_list(num_perceptrons, num_inputs)
         
         if weights != None:    
             self.weight_matrix = weights
