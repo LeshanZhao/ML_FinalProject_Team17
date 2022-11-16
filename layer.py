@@ -5,6 +5,7 @@ Created on Thu Nov 10 10:56:14 2022
 @author: heckenna
 """
 import perceptron
+import neural_node
 import numpy as np
 import random
 
@@ -18,7 +19,7 @@ class Layer:
         if weights != None:    
             self.weight_matrix = weights
         else:
-            # Initialize weights on U(0,1). Maybe do differently
+            # Initialize weights on U(-num_perc, num_perc). 
             self.weight_matrix = self.build_weight_matrix(num_perceptrons, num_inputs)
             
         
@@ -32,7 +33,7 @@ class Layer:
         
         # Has each percepton do a prediction
         for w_row, perc in zip(self.weight_matrix, self.perceptron_list):
-            output.append(perc.predict(np.dot(w_row, layer_input)))
+            output.append(perc.pred(np.dot(w_row, layer_input)))
             
         return output
         
@@ -41,11 +42,11 @@ class Layer:
     def forward(self):
         return
     
-    def backward(self):
+    def backward(self, delta = None):
         return
     
     def build_percepton_list(self, num_perceptrons, num_inputs):
-        return [perceptron.Perceptron(size = num_inputs) for i in range(num_perceptrons)]
+        return [neural_node.Neural_Node(size = num_inputs) for i in range(num_perceptrons)]
         
     def build_weight_matrix(self, num_perceptrons, num_inputs):
         weights = []

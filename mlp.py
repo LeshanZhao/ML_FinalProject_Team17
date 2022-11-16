@@ -38,12 +38,18 @@ class MLP:
         y_output_layer_list = self.output_layer.predict(y_last_layer)
 
         print("forward done")
-
-        return y_output_layer_list[0]
+        
+        output_result = y_output_layer_list[0]
+        
+        if output_result >= .5:
+            return 1
+        return 0
         
     
     def _backward(self):
         print("Backward start")
+        # TODO
+        
         print("Backward done (nothing done yet)")
         
 
