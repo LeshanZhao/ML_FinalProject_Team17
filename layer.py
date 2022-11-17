@@ -43,7 +43,7 @@ class Layer:
 
     
     # y_train provided only in output layer. delta None if output
-    def backward(self, next_deltas = None, next_weights = None, y_train = None, lr):
+    def backward(self, lr, next_deltas = None, next_weights = None, y_train = None):
         ## If output layer... mul_term = (y_train - o_k)
         ## Else: mul_term = sum([next_weights[i][h]*delta[h] for i in range(len(delta))]) 
         # TODO
