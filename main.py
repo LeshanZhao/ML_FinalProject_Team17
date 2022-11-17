@@ -24,6 +24,8 @@ size = 13
 h_num = 2000
 
 # Running on top 2000 rows currently, just to save time with debugging
+
+# TODO: Test NN functionality
 perc = Perceptron(size = size, epochs = 10)
 perc.train_classifier(X_train.head(h_num), y_train.head(h_num))
 

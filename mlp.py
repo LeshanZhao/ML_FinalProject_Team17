@@ -8,17 +8,34 @@ from perceptron import Perceptron
 from layer import Layer
 
 class MLP:
-    def __init__(self, 
+    def dep__init__(self, 
                 Input_Layer: Layer, 
                 Output_Layer: Layer,
                 Hidden_Layers: list[Layer],
                 X,
                 y):
+        # TODO: instead of passing in layers, tell it how many layers and what sizes
+        # We should build the layers here
+        
         self.input_layer = Input_Layer
         self.output_layer = Output_Layer
         self.hidden_layers = Hidden_Layers
         self.X = X # TODO no need to initialize X and Y
         self.y = y
+
+    # TODO: Write the init function to take these parameters
+    def __init__(self, num_features, num_hidden_layers, hidden_sizes):
+        # num_features is number of features we will have. Size of input layer
+        # num_hidden_layers = number of hidden layers we will have
+        # hidden_sizes = list of integers of length num_hidden_layers. 
+        #     hidden_sizes[i] = size of hidden_layer i
+        #     hidden_sizes[i - 1] = number of inputs for hidden_layer i
+        
+        # TODO: build the different layers here using the constructor in Layer class
+        
+        
+        return
+        
 
     def train(self, X, y):
         for row, y_targ in zip(X, y):
