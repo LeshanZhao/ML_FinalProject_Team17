@@ -16,7 +16,7 @@ class Layer:
         
         self.node_list = self.build_percepton_list(num_perceptrons, num_inputs)
         
-        if weights != None:    
+        if not (weights is None):
             self.weight_matrix = weights
         else:
             # Initialize weights on U(-num_perc, num_perc). 
@@ -43,7 +43,7 @@ class Layer:
 
     
     # y_train provided only in output layer. delta None if output
-    def backward(self, next_deltas = None, next_weights = None, y_train = None, lr):
+    def backward(self, lr, next_deltas = None, next_weights = None, y_train = None):
         ## If output layer... mul_term = (y_train - o_k)
         ## Else: mul_term = sum([next_weights[i][h]*delta[h] for i in range(len(delta))]) 
         # TODO
@@ -68,7 +68,7 @@ class Layer:
         # Output layer case
         if (y_train != None):
             node = self.node_list[0]
-            o_k = node.output
+            o_k = node.output # Needs to be threshold?
             
             mul_term = (y_train - o_k)
             
