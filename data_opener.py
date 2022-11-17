@@ -41,8 +41,8 @@ def get_data(filename = "cardio_train.csv"):
     # Could do same to chol and gluc if desired
     df.rename(columns = {"gender_2":"is_man"}, inplace = True)
     
-    # Dont normalize. Unneeded for NN
-    #df = normalize_data(df)
+    # Dont normalize. Unneeded for NN. Actually might want it...?
+    df = normalize_data(df)
     
     # Max corr is .5, so correlation not going to be used for feature selection
     #corr_matrix = data.corr()

@@ -16,7 +16,7 @@ class Layer:
         
         self.node_list = self.build_percepton_list(num_perceptrons, num_inputs)
         
-        if weights != None:    
+        if not (weights is None):
             self.weight_matrix = weights
         else:
             # Initialize weights on U(-num_perc, num_perc). 
@@ -68,7 +68,7 @@ class Layer:
         # Output layer case
         if (y_train != None):
             node = self.node_list[0]
-            o_k = node.output
+            o_k = node.output # Needs to be threshold?
             
             mul_term = (y_train - o_k)
             
