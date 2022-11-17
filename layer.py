@@ -11,13 +11,14 @@ import random
 
 class Layer:
     
-    def __init__(self, num_perceptrons, num_inputs, include_bias = False, weights = None):
+    def __init__(self, num_perceptrons, num_inputs, include_bias = False, weights = None, is_input_layer = False):
         self.bias = include_bias
-        
+        self.is_input = is_input_layer
         self.node_list = self.build_percepton_list(num_perceptrons, num_inputs)
         
-        if not (weights is None):
-            self.weight_matrix = weights
+        if self.is_input:
+            # input is funky...
+            self.weight_matrix = self.build_weight_matrix(num_perceptrons, 1)
         else:
             # Initialize weights on U(-num_perc, num_perc). 
             self.weight_matrix = self.build_weight_matrix(num_perceptrons, num_inputs)
@@ -30,9 +31,25 @@ class Layer:
         
         if self.bias:
             output.append(1)
+            
+        if self.is_input:
+            # We just have 1 input per node...
+            # Weights are list not matrix
+            for i in range(len(self.node_list)):
+                w_i = self.weight_matrix[i] # w_i is List of length 1
+                perc  = self.node_list[i]
+                
+                # Putting these a 1 element lists for sake of np.dot
+                output.append(perc.pred(w_i, [layer_input[i]])) #Ternary???
+            return output
+        
+        # If we are not input...
         
         # Has each percepton do a prediction
-        for w_row, perc in zip(self.weight_matrix, self.node_list):
+        for i in range(len(self.node_list)):
+            w_row = self.weight_matrix[i]
+            perc  = self.node_list[i]
+            
             # For node node_list[i], weight_matrix[i] is corresponding weights
             output.append(perc.pred(w_row, layer_input))
             
@@ -47,14 +64,14 @@ class Layer:
         ## If output layer... mul_term = (y_train - o_k)
         ## Else: mul_term = sum([next_weights[i][h]*delta[h] for i in range(len(delta))]) 
         # TODO
-        deltas = compute_deltas(next_deltas, next_weights, y_train)
+        deltas = self.compute_deltas(next_deltas, next_weights, y_train)
         
-        for node, delt, weight_list in zip(self.nodes, deltas, self.weight_matrix):
+        for node, delt, weight_list in zip(self.node_list, deltas, self.weight_matrix):
             x_j = node.x_j 
-            w_change = lr*delt*x_j
+            w_change = lr*np.array(delt)*np.array(x_j)
             
             # I think this should change weight matrix via mutation... 
-            # Can come back later to confirm
+            # Can come back later to confirm. Things seem to be changing
             for i in range(len(weight_list)):
                 weight_list[i] += w_change[i]
             
@@ -69,6 +86,10 @@ class Layer:
         if (y_train != None):
             node = self.node_list[0]
             o_k = node.output # Needs to be threshold?
+            #if ok >=.5:
+            #    o_k = 1
+            #else:
+            #    o_k = 0
             
             mul_term = (y_train - o_k)
             
@@ -82,7 +103,7 @@ class Layer:
         
         for h in range(len(self.node_list)):
             node = self.node_list[h]
-            mul_term = sum([next_weights[h][k] * next_deltas[k] for k in range(len(next_deltas))])
+            mul_term = sum([next_weights[k][h] * next_deltas[k] for k in range(len(next_deltas))])
             
             d_k = self.compute_delta_helper(node, mul_term)
             d_k_list.append(d_k)
@@ -108,4 +129,6 @@ class Layer:
             for j in range(num_inputs):
                 p_weights.append(random.randrange(-num_perceptrons, num_perceptrons + 1))
             weights.append(p_weights)
+            
+        return weights
             
