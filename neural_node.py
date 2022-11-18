@@ -28,10 +28,10 @@ class Neural_Node:
         # Prevent the overflow error
         if act_input >= 500:
             self.output = 1
-        elif act_input <= 500:
+        elif act_input <= -500:
             self.output = 0
         else:    
-            self.output = self.act_func()
+            self.output = self.act_func(act_input)
         
         return self.output
     

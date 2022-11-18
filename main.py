@@ -153,6 +153,7 @@ for i in range(200):
                                     next_deltas = d_h1, 
                                     next_weights = layer_h1_test.weight_matrix)
 #"""
+
 care_for = 10
 pred_y = []
 
@@ -162,7 +163,7 @@ for i in range(care_for):
     x_val = X_train.iloc[i]
     y_val = y_train.iloc[i]
     
-    lay_out = layer_in_test.forward(x_val)
+    lay_out = layer_i_test.forward(x_val)
     lay_out = layer_h1_test.forward(lay_out)
     lay_out = layer_o_test.forward(lay_out)
 
@@ -172,7 +173,7 @@ for i in range(care_for):
         pred_y.append(0)
 
 print(get_acc(pred_y, y_head))
-
+#"""
 #print(d_o)
 
 #perc = Perceptron(size = size, epochs = 10)
@@ -186,10 +187,11 @@ print(get_acc(pred_y, y_head))
 
 #print(acc_train)
 #print(acc_test)
-
-layer_i_test = layer.Layer(size, size, is_input_layer = True)
-layer_h1_test = layer.Layer(num_perceptrons = h1_size, num_inputs = size)
-layer_o_test = layer.Layer(num_perceptrons = 1, num_inputs = h1_size)
+h1_size = 5
+lr = 1
+#layer_i_test = layer.Layer(size, size, is_input_layer = True)
+#layer_h1_test = layer.Layer(num_perceptrons = h1_size, num_inputs = size)
+#layer_o_test = layer.Layer(num_perceptrons = 1, num_inputs = h1_size)
 
 for j in range(10):
     x_val = X_train.iloc[j]
