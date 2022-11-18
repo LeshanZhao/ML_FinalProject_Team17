@@ -63,8 +63,19 @@ class Layer:
     def backward(self, lr, next_deltas = None, next_weights = None, y_train = None):
         ## If output layer... mul_term = (y_train - o_k)
         ## Else: mul_term = sum([next_weights[i][h]*delta[h] for i in range(len(delta))]) 
-        # TODO
+        # TODO: Back prop for input layer
         deltas = self.compute_deltas(next_deltas, next_weights, y_train)
+        
+        if self.is_input:
+            for i in range(len(self.node_list)):
+                node = self.node_list[i]
+                delt = deltas[i]
+                feature = node.x_j[0]
+                
+                w_change = lr*np.array(delt)*feature
+                
+                self.weight_matrix[i][0] += w_change
+            return #deltas # No need to return anything... input layer
         
         for node, delt, weight_list in zip(self.node_list, deltas, self.weight_matrix):
             x_j = node.x_j 
@@ -88,7 +99,12 @@ class Layer:
             #else:
             #    o_k = 0
             
+            # Going to use threshold only here to see if progress...
             mul_term = (y_train - o_k)
+            if (o_k >= 0.5 and y_train == 1) or (ok < .5 and y_train == 0):
+                mul_term = 0
+            else:
+                mul_term = 1
             
             d_k = self.compute_delta_helper(node, mul_term)
             
