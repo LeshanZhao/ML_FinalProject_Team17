@@ -13,8 +13,7 @@ class MLP:
                 Output_Layer: Layer,
                 Hidden_Layers: list[Layer],
                 X,
-                y,
-                lr):
+                y):
         # TODO: instead of passing in layers, tell it how many layers and what sizes
         # We should build the layers here
         
@@ -23,10 +22,14 @@ class MLP:
         self.hidden_layers = Hidden_Layers
         self.X = X # TODO no need to initialize X and Y
         self.y = y
-        self.lr = lr
 
     # TODO: Write the init function to take these parameters
-    def __init__(self, num_features, num_hidden_layers, hidden_sizes):
+    def __init__(self, 
+                num_features, 
+                num_hidden_layers, 
+                hidden_sizes, 
+                n_epochs = 1, 
+                lr = 1):
         # num_features is number of features we will have. Size of input layer
         # num_hidden_layers = number of hidden layers we will have
         # hidden_sizes = list of integers of length num_hidden_layers. 
@@ -35,7 +38,9 @@ class MLP:
         # TODO: build the different layers here using the constructor in Layer class
         self.num_features = num_features
         self.input_layer= Layer(num_features, num_features, is_input_layer = True)
-       
+        self.lr = lr
+        self.n_epochs = n_epochs
+
         self.hidden_layers = []
         for j in range(num_hidden_layers):
             if j == 0:
@@ -66,8 +71,8 @@ class MLP:
             #     print(weights)
 
 
-    def train(self, X, y):
-        for row, y_targ in zip(X, y):
+    def train(self):
+        for row, y_targ in zip(self.X, self.y):
             self.train_row(row, y_targ)
 
     def train_row(self, row, y_targ):
@@ -75,9 +80,9 @@ class MLP:
         self._backward(row, y_targ)
         return
 
-    def _forward(self, x):
+    def _forward(self,row):
         # get output from input layer
-        y_last_layer = self.input_layer.forward(self.X)
+        y_last_layer = self.input_layer.forward(row)
 
         # hidden layers
         print("forward start")
@@ -92,7 +97,8 @@ class MLP:
         
         if output_result >= .5:
             return 1
-        return 0
+        else:
+            return 0
         
     
     def _backward(self):
