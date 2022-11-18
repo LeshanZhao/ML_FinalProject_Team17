@@ -31,7 +31,7 @@ class Neural_Node:
         elif act_input <= -500:
             self.output = 0
         else:    
-            self.output = self.act_func()
+            self.output = self.act_func(act_input)
         
         return self.output
     
