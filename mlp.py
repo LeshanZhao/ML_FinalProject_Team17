@@ -33,13 +33,17 @@ class MLP:
         
         # TODO: build the different layers here using the constructor in Layer class
         self.num_features = num_features
-        self.num_hidden_layers = num_hidden_layers
-        self.hidden_sizes = hidden_sizes
-
-        for x in num_hidden_layers: 
-            self.hidden_sizes = hidden_sizes
-        #return
-        
+        self.input_layer= Layer(num_features, num_features, is_input_layer = True)
+       
+        self.hidden_layers = []
+        for j in range(num_hidden_layers):
+            if j == 0:
+                layer = Layer(hidden_sizes[j], self.num_features)
+            else: 
+                layer = Layer(hidden_sizes[j], hidden_sizes[j-1])  
+            self.hidden_layers.append(layer)
+        self.output_layer = Layer(1, hidden_sizes[-1]) 
+            
 
     def train(self, X, y):
         for row, y_targ in zip(X, y):
