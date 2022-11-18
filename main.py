@@ -195,9 +195,9 @@ for j in range(10):
     x_val = X_train.iloc[j]
     y_val = y_train.iloc[j]
     lay_out = layer_i_test.forward(x_val)
-    #print(lay_out)
+    print(lay_out)
     lay_out = layer_h1_test.forward(lay_out)
-    #print(lay_out)
+    print(lay_out)
     lay_out = layer_o_test.forward(lay_out)
     print("Prediction:", lay_out)
     print("Actual:", y_val)
