@@ -9,9 +9,9 @@ from layer import Layer
 
 class MLP:
     def dep__init__(self, 
-                Input_Layer: Layer, 
-                Output_Layer: Layer,
-                Hidden_Layers: list[Layer],
+                Input_Layer, 
+                Output_Layer,
+                Hidden_Layers,
                 X,
                 y):
         # TODO: instead of passing in layers, tell it how many layers and what sizes
@@ -37,9 +37,10 @@ class MLP:
         #     hidden_sizes[i - 1] = number of inputs for hidden_layer i
         # TODO: build the different layers here using the constructor in Layer class
         self.num_features = num_features
-        self.input_layer= Layer(num_features, num_features, is_input_layer = True)
         self.lr = lr
         self.n_epochs = n_epochs
+
+        self.input_layer= Layer(num_features, num_features, is_input_layer = True)
 
         self.hidden_layers = []
         for j in range(num_hidden_layers):
@@ -48,6 +49,7 @@ class MLP:
             else: 
                 layer = Layer(hidden_sizes[j], hidden_sizes[j-1])  
             self.hidden_layers.append(layer)
+        
         self.output_layer = Layer(1, hidden_sizes[-1]) 
             
 
@@ -71,14 +73,13 @@ class MLP:
             #     print(weights)
 
 
-    def train(self, X, y):
+    def train(self, X, y, lr = None):
         for row, y_targ in zip(X, y):
-            self.train_row(row, y_targ)
+            self.train_row(row, y_targ, lr)
 
-    def train_row(self, row, y_targ):
+    def train_row(self, row, y_targ, lr = None):
         self._forward(row)
-        self._backward(row, y_targ)
-        return
+        self._backward(row, y_targ, lr)
 
     def _forward(self,row):
         # get output from input layer
@@ -101,16 +102,23 @@ class MLP:
             return 0
         
     
-    def _backward(self):
+    def _backward(self, targ_y, lr = None):
+        if lr is None:
+            lr = self.lr
         print("Backward start")
         # TODO
-        delta_last_layer = [self.output_layer.backward(self.lr, y_train = self.y)]
+        delta_next_layer = [self.output_layer.backward(self.lr, 
+                                                       y_train = targ_y)]
         
-        for nxt_hidden_layer in self.hidden_layers:
-            delta_last_layer = nxt_hidden_layer.backward(self.lr, 
-                                                        next_deltas = delta_last_layer,
-                                                        next_weights = nxt_hidden_layer.weight_matrix)
-        
+        for i in range(len(self.hidden_layers), -1, -1):
+            next_hidden_layer = self.hidden_layers[i]
+            delta_next_layer = next_hidden_layer.backward(self.lr, 
+                                                        next_deltas = delta_next_layer,
+                                                        next_weights = next_hidden_layer.weight_matrix)
+        self.input_layer.backward(self.lr,
+                                  next_deltas = delta_next_layer,
+                                  next_weights= next_hidden_layer.weight_matrix)
+
         print("Backward done (nothing done yet)")
         
 
