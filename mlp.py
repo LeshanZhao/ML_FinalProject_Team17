@@ -9,9 +9,9 @@ from layer import Layer
 
 class MLP:
     def dep__init__(self, 
-                Input_Layer: Layer, 
-                Output_Layer: Layer,
-                Hidden_Layers: list[Layer],
+                #Input_Layer: Layer, 
+                #Output_Layer: Layer,
+                #Hidden_Layers: list[Layer],
                 X,
                 y):
         # TODO: instead of passing in layers, tell it how many layers and what sizes
@@ -83,6 +83,7 @@ class MLP:
     def _forward(self,row):
         # get output from input layer
         y_last_layer = self.input_layer.forward(row)
+
 
         # hidden layers
         print("forward start")
