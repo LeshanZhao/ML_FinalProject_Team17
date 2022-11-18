@@ -112,11 +112,18 @@ class MLP:
         
         return 0
 
+    def pred(self, rows):
+        Y = []
+        for row in rows: 
+            y = self.pred_row(row)
+            Y.append(y)
+        return Y
 
-
-
-    def pred(self, row):
+    def pred_row(self, row):
+       return self._forward(row)
         
-        return 
+
+    
+    
     
     
