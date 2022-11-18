@@ -223,8 +223,8 @@ for j in range(care_for):
                                 next_weights = layer_h1_test.weight_matrix)
 #"""
 size = 13
-x_val = X_train.iloc[j]
-y_val = y_train.iloc[j]
+#x_val = X_train.iloc[j]
+#y_val = y_train.iloc[j]
 
 
 #smoke_col = X_train[["smoke", "active"]]
@@ -245,7 +245,7 @@ my_new_perceptron = mlp.MLP(num_features = size, num_hidden_layers = 1, hidden_s
 #my_new_perceptron = mlp.MLP(num_features = size, num_hidden_layers = 1, hidden_sizes = [3])
 
 
-out = my_new_perceptron.train(X_train.head(100), y_train.head(100), epochs  = 1, lr = lr, batch_size = len(y_try))
+out = my_new_perceptron.train(X_train.head(10000), y_train.head(10000), epochs  = 3, lr = lr, batch_size = len(y_try))
 
 #out = my_new_perceptron.pred(X_train) #, y_try)
 
@@ -266,7 +266,7 @@ sortby = SortKey.CUMULATIVE
 ps = pstats.Stats(ob, stream=sec).sort_stats("tottime")
 ps.print_stats(15)
 ps = pstats.Stats(ob, stream=sec).sort_stats("cumtime")
-ps.print_stats(15)
+ps.print_stats(20)
 
 
 print(sec.getvalue())

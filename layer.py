@@ -79,10 +79,11 @@ class Layer:
     def backward(self, lr, next_deltas = None, next_weights = None, y_train = None):
         ## If output layer... mul_term = (y_train - o_k)
         ## Else: mul_term = sum([next_weights[i][h]*delta[h] for i in range(len(delta))]) 
-        # TODO: Back prop for input layer
+        # TODO: Remove overhead. This is most inefficient function as far as I can tell
         weight_max = 13
         
         deltas = self.compute_deltas(next_deltas, next_weights, y_train)
+        
         
         if self.is_input:
             for i in range(len(self.node_list)):
@@ -101,8 +102,7 @@ class Layer:
             x_j = node.x_j 
             w_change = lr*np.array(delt)*np.array(x_j)
             
-            # I think this should change weight matrix via mutation... 
-            # Can come back later to confirm. Things seem to be changing
+            # This should change weight matrix via mutation 
             for i in range(len(weight_list)):
                 if abs(weight_list[i] + w_change[i]) >= weight_max:
                     continue
@@ -135,6 +135,7 @@ class Layer:
             # returning list of deltas
             return [d_k]
             
+        """
         # Otherwise we are input or hidden layer. These nodes need future info...
         d_k_list = []
         
@@ -143,11 +144,22 @@ class Layer:
             mul_term = sum([next_weights[k][h] * next_deltas[k] for k in range(len(next_deltas))])
             
             d_k = self.compute_delta_helper(node, mul_term)
+            
+            # TODO remove append for efficiency
             d_k_list.append(d_k)
-
-
         return d_k_list
-    
+        """
+        
+        return [self.compute_delta_helper_vec(h, next_weights, next_deltas) for h in range(len(self.node_list))]
+        
+        
+    def compute_delta_helper_vec(self, h, next_weights, next_deltas):
+        node = self.node_list[h]
+        mul_term = sum([next_weights[k][h] * next_deltas[k] for k in range(len(next_deltas))])
+            
+        # Return d_k
+        return self.compute_delta_helper(node, mul_term)
+            
     def compute_delta_helper(self, node, mul_term):
         # Computes delta of the node.
         o_k = node.output

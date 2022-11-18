@@ -76,9 +76,8 @@ class MLP:
     def train(self, X, y, lr = None, batch_size = 25, epochs = None):
         if epochs is None:
             epochs = self.n_epochs
-        # May want to run with this idea instead for sake of efficiency   
-        #X.apply(self.train_row_funcs, axis=1)
-        
+        [self.train_df(X, y, lr) for e in range(epochs)]
+        """
         for i in range(int(X.shape[0]/batch_size)):
             # Runs training on batches of 25
             for e in range(epochs):
@@ -86,10 +85,13 @@ class MLP:
                     row = X.iloc[j]
                     y_targ = y.iloc[j]
                     self.train_row(row, y_targ, lr)
-
-    # Could curry stuff...
-    def train_row_funcs(self, row):
-        return 
+        """
+        
+    def train_df(self, X, y, lr):
+        # Uses lexical scoping and list comprehensions.
+        # Right now, batch size unused. Still have overhead here, but better than before
+        func_series = X.apply(lambda row: (lambda y: self.train_row(row, y, lr)), axis=1)
+        [func_series.iloc[i](y.iloc[i]) for i in range(len(y))]
     
     def train_row(self, row, y_targ, lr = None):
         self._forward(row)
@@ -101,9 +103,10 @@ class MLP:
 
 
         # hidden layers
+        # TODO: Remove some overhead getting rid of for loop in some way 
         for nxt_hidden_layer in self.hidden_layers:
             y_last_layer = nxt_hidden_layer.forward(y_last_layer)
-
+        
         y_output_layer_list = self.output_layer.forward(y_last_layer)
 
         
@@ -123,6 +126,8 @@ class MLP:
         delta_next_layer = self.output_layer.backward(self.lr, 
                                                       y_train = targ_y)
         next_hidden_layer = self.output_layer
+        
+        # TODO: Remove for loop overhead? 
         for i in range(len(self.hidden_layers)-1, -1, -1):
             
             current_hidden_layer = self.hidden_layers[i]
