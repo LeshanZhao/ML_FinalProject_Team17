@@ -106,8 +106,8 @@ class Layer:
             # Going to use threshold only here to see if progress...
             mul_term = (y_train - o_k)
 
-            #if (o_k >= 0.5 and y_train == 1) or (o_k < .5 and y_train == 0):
-            #    mul_term = 0
+            if (o_k >= 0.75 and y_train == 1) or (o_k < .25 and y_train == 0):
+                mul_term = mul_term
             #else:
             #    mul_term = 1
 

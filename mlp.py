@@ -103,7 +103,7 @@ class MLP:
         
         output_result = y_output_layer_list[0]
         
-        #return output_result #TODO revert
+        return output_result #TODO revert
         if output_result >= .5:
             return 1
         else:

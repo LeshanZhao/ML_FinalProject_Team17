@@ -217,17 +217,26 @@ size = 13
 x_val = X_train.iloc[j]
 y_val = y_train.iloc[j]
 
+
+#smoke_col = X_train[["smoke", "active"]]
+
 bs = 25
 
-X_try = X_train.head(100) #[y_train == 0]
-y_try = y_train.head(100)
+X_try = X_train.head(50) #[y_train == 0]
+y_try = y_train.head(50)
+
+#x_smoke = smoke_col.head(500)
+#y_try = y_train.head(500)
 
 lr = 1
 
 #my_little_perceptron.print_network()
-#my_little_perceptron = mlp.MLP(num_features = size, num_hidden_layers = 3, hidden_sizes = [15, 12, 10])
+#my_little_perceptron = mlp.MLP(num_features = size, num_hidden_layers = 1, hidden_sizes = [6])
 
-out = my_little_perceptron.train(X_try, y_try, epochs  = 50, lr = lr, batch_size = bs)
+#my_little_perceptron = mlp.MLP(num_features = size, num_hidden_layers = 1, hidden_sizes = [3])
+
+
+out = my_little_perceptron.train(X_try, y_try, epochs  = 1000, lr = lr, batch_size = len(y_try))
 
 out = my_little_perceptron.pred(X_try) #, y_try)
 
