@@ -71,8 +71,8 @@ class MLP:
             #     print(weights)
 
 
-    def train(self):
-        for row, y_targ in zip(self.X, self.y):
+    def train(self, X, y):
+        for row, y_targ in zip(X, y):
             self.train_row(row, y_targ)
 
     def train_row(self, row, y_targ):
@@ -107,16 +107,12 @@ class MLP:
         delta_last_layer = [self.output_layer.backward(self.lr, y_train = self.y)]
         
         for nxt_hidden_layer in self.hidden_layers:
-            # delta_last_layer = nxt_hidden_layer.backward(self.lr, 
-            #                                             next_deltas = delta_last_layer,
-            #                                             next_weights = nxt_hidden_layer.)
+            delta_last_layer = nxt_hidden_layer.backward(self.lr, 
+                                                        next_deltas = delta_last_layer,
+                                                        next_weights = nxt_hidden_layer.weight_matrix)
         
-            pass
-
-
         print("Backward done (nothing done yet)")
         
-        return 0
 
     def pred(self, rows):
         Y = []
