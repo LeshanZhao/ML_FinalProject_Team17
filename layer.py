@@ -43,11 +43,11 @@ class Layer:
 
     
     # y_train provided only in output layer. delta None if output
-    def backward(self, next_deltas = None, next_weights = None, y_train = None, lr):
+    def backward(self, lr, next_deltas = None, next_weights = None, y_train = None):
         ## If output layer... mul_term = (y_train - o_k)
         ## Else: mul_term = sum([next_weights[i][h]*delta[h] for i in range(len(delta))]) 
         # TODO
-        deltas = compute_deltas(next_deltas, next_weights, y_train)
+        deltas = self.compute_deltas(next_deltas, next_weights, y_train)
         
         for node, delt, weight_list in zip(self.nodes, deltas, self.weight_matrix):
             x_j = node.x_j 
@@ -57,9 +57,6 @@ class Layer:
             # Can come back later to confirm
             for i in range(len(weight_list)):
                 weight_list[i] += w_change[i]
-            
-            
-            
         
         # Returns deltas so they can be used for earlier layer back prop
         return deltas
@@ -86,8 +83,8 @@ class Layer:
             
             d_k = self.compute_delta_helper(node, mul_term)
             d_k_list.append(d_k)
-        
-   
+
+
         return d_k_list
     
     def compute_delta_helper(self, node, mul_term):

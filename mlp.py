@@ -13,7 +13,8 @@ class MLP:
                 Output_Layer: Layer,
                 Hidden_Layers: list[Layer],
                 X,
-                y):
+                y,
+                lr):
         # TODO: instead of passing in layers, tell it how many layers and what sizes
         # We should build the layers here
         
@@ -22,6 +23,7 @@ class MLP:
         self.hidden_layers = Hidden_Layers
         self.X = X # TODO no need to initialize X and Y
         self.y = y
+        self.lr = lr
 
     # TODO: Write the init function to take these parameters
     def __init__(self, num_features, num_hidden_layers, hidden_sizes):
@@ -69,20 +71,25 @@ class MLP:
     def _backward(self):
         print("Backward start")
         # TODO
-        
-        y_output_layer_list = self.output_layer.forward(y_last_layer)
+        delta_last_layer = [self.output_layer.backward(self.lr, y_train = self.y)]
         
         for nxt_hidden_layer in self.hidden_layers:
-            y_last_layer = nxt_hidden_layer.forward(y_last_layer)
+            delta_last_layer = nxt_hidden_layer.backward(self.lr, 
+                                                        next_deltas = delta_last_layer,
+                                                        next_weights = nxt_hidden_layer.)
         
+
+
+
         print("Backward done (nothing done yet)")
         
+        return 0
 
 
 
 
     def pred(self, row):
-
+        
         return 
     
     
