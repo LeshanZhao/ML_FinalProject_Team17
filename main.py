@@ -245,11 +245,11 @@ my_new_perceptron = mlp.MLP(num_features = size, num_hidden_layers = 1, hidden_s
 #my_new_perceptron = mlp.MLP(num_features = size, num_hidden_layers = 1, hidden_sizes = [3])
 
 
-#out = my_new_perceptron.train(X_train, y_train, epochs  = 1, lr = lr, batch_size = len(y_try))
+out = my_new_perceptron.train(X_train.head(100), y_train.head(100), epochs  = 1, lr = lr, batch_size = len(y_try))
 
-out = my_new_perceptron.pred(X_train) #, y_try)
+#out = my_new_perceptron.pred(X_train) #, y_try)
 
-out_test = my_new_perceptron.pred(X_test.head(100)) #, y_try)
+#out_test = my_new_perceptron.pred(X_test.head(100)) #, y_try)
 
 
 #print("Output:",out)

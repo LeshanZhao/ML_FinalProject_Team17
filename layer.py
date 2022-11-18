@@ -104,7 +104,7 @@ class Layer:
             # I think this should change weight matrix via mutation... 
             # Can come back later to confirm. Things seem to be changing
             for i in range(len(weight_list)):
-                if abs(weight_list[i] + w_change) >= weight_max:
+                if abs(weight_list[i] + w_change[i]) >= weight_max:
                     continue
                 weight_list[i] += w_change[i]
         
