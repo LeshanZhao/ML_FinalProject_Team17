@@ -43,6 +43,21 @@ class MLP:
         #return
         
 
+    def print_network(self):
+        for i, layer in enumerate([self.input_layer] + self.hidden_layers + [self.output_layer]):
+            if (layer.is_input):
+                print("Input Layer: ",end='')
+            elif (len(layer.node_list) == 1):
+                print("Output Layer: ",end='')
+            else:
+                print("Hidden Layer " + str(i) + ": ", end='')
+            
+            for j, node in enumerate (layer.node_list):
+                print("Node_" + str(j) + "-", end='\t')
+                print(str(node.output))
+
+
+
     def train(self, X, y):
         for row, y_targ in zip(X, y):
             self.train_row(row, y_targ)
@@ -78,11 +93,11 @@ class MLP:
         delta_last_layer = [self.output_layer.backward(self.lr, y_train = self.y)]
         
         for nxt_hidden_layer in self.hidden_layers:
-            delta_last_layer = nxt_hidden_layer.backward(self.lr, 
-                                                        next_deltas = delta_last_layer,
-                                                        next_weights = nxt_hidden_layer.)
+            # delta_last_layer = nxt_hidden_layer.backward(self.lr, 
+            #                                             next_deltas = delta_last_layer,
+            #                                             next_weights = nxt_hidden_layer.)
         
-
+            pass
 
 
         print("Backward done (nothing done yet)")
