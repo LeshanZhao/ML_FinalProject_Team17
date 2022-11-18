@@ -23,7 +23,16 @@ class Neural_Node:
     # Gonna do dot product before this piece...
     def pred(self, x, w):
         self.x_j = x
-        self.output = self.act_func(np.dot(x, w))
+        act_input = np.dot(x, w)
+        
+        # Prevent the overflow error
+        if act_input >= 500:
+            self.output = 1
+        elif act_input <= 500:
+            self.output = 0
+        else:    
+            self.output = self.act_func()
+        
         return self.output
     
     

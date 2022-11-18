@@ -11,7 +11,11 @@ import random
 
 class Layer:
     
-    def __init__(self, num_perceptrons, num_inputs, include_bias = False, weights = None, is_input_layer = False):
+    def __init__(self, num_perceptrons, num_inputs, include_bias = False, is_input_layer = False):
+        # num_perceptrons = number of perceptrons in the layer
+        # num_inputs = size of the input vector to each node of the layer.
+        #     is num_perceptrons for previous layer
+        # is_input_layer = True if is input layer, otherwise false
         self.bias = include_bias
         self.is_input = is_input_layer
         self.node_list = self.build_percepton_list(num_perceptrons, num_inputs)
@@ -51,7 +55,7 @@ class Layer:
             perc  = self.node_list[i]
             
             # For node node_list[i], weight_matrix[i] is corresponding weights
-            output.append(perc.pred(w_row, layer_input))
+            output.append(perc.pred(layer_input, w_row))
             
         return output
         
@@ -75,7 +79,7 @@ class Layer:
                 w_change = lr*np.array(delt)*feature
                 
                 self.weight_matrix[i][0] += w_change
-            return #deltas # No need to return anything... input layer
+            return deltas # No need to return anything... input layer
         
         for node, delt, weight_list in zip(self.node_list, deltas, self.weight_matrix):
             x_j = node.x_j 
@@ -91,7 +95,7 @@ class Layer:
         
     def compute_deltas(self, next_deltas = None, next_weights = None, y_train = None):
         # Output layer case
-        if (y_train != None):
+        if not(y_train is None):
             node = self.node_list[0]
             o_k = node.output # Needs to be threshold?
             #if ok >=.5:
@@ -101,10 +105,12 @@ class Layer:
             
             # Going to use threshold only here to see if progress...
             mul_term = (y_train - o_k)
-            if (o_k >= 0.5 and y_train == 1) or (o_k < .5 and y_train == 0):
-                mul_term = 0
-            else:
-                mul_term = 1
+
+            #if (o_k >= 0.5 and y_train == 1) or (o_k < .5 and y_train == 0):
+            #    mul_term = 0
+            #else:
+            #    mul_term = 1
+
             
             d_k = self.compute_delta_helper(node, mul_term)
             
