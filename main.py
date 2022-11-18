@@ -217,12 +217,23 @@ size = 13
 x_val = X_train.iloc[j]
 y_val = y_train.iloc[j]
 
-X_try = X_train.head(5)
-y_try = y_train.head(5)
+bs = 25
 
-my_little_perceptron = mlp.MLP(num_features = size, num_hidden_layers = 1, hidden_sizes = [5])
-out = my_little_perceptron.train(X_try, y_try)
+X_try = X_train.head(100) #[y_train == 0]
+y_try = y_train.head(100)
+
+lr = 1
+
+#my_little_perceptron.print_network()
+#my_little_perceptron = mlp.MLP(num_features = size, num_hidden_layers = 3, hidden_sizes = [15, 12, 10])
+
+out = my_little_perceptron.train(X_try, y_try, epochs  = 50, lr = lr, batch_size = bs)
+
+out = my_little_perceptron.pred(X_try) #, y_try)
 
 print("Output:",out)
-print("Actual:",y_val)
+print("Actual:\n" + str(y_try))
+
+print(get_acc(out, y_try))
+
 

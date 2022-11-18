@@ -73,15 +73,21 @@ class MLP:
             #     print(weights)
 
 
-    def train(self, X, y, lr = None):
-        for i in range(X.shape[0]):
-            row = X.iloc[i]
-            y_targ = y.iloc[i]
-            self.train_row(row, y_targ, lr)
+    def train(self, X, y, lr = None, batch_size = 25, epochs = None):
+        if epochs is None:
+            epochs = self.n_epochs
+        
+        for i in range(int(X.shape[0]/batch_size)):
+            # Runs training on batches of 25
+            for e in range(epochs):
+                for j in range(i*batch_size,(i+1)*batch_size):
+                    row = X.iloc[j]
+                    y_targ = y.iloc[j]
+                    self.train_row(row, y_targ, lr)
 
     def train_row(self, row, y_targ, lr = None):
         self._forward(row)
-        self._backward(row, y_targ, lr)
+        self._backward(y_targ, lr)
 
     def _forward(self,row):
         # get output from input layer
@@ -89,16 +95,15 @@ class MLP:
 
 
         # hidden layers
-        print("forward start")
         for nxt_hidden_layer in self.hidden_layers:
             y_last_layer = nxt_hidden_layer.forward(y_last_layer)
 
         y_output_layer_list = self.output_layer.forward(y_last_layer)
 
-        print("forward done")
         
         output_result = y_output_layer_list[0]
         
+        #return output_result #TODO revert
         if output_result >= .5:
             return 1
         else:
@@ -108,21 +113,22 @@ class MLP:
     def _backward(self, targ_y, lr = None):
         if lr is None:
             lr = self.lr
-        print("Backward start")
         # TODO
-        delta_next_layer = [self.output_layer.backward(self.lr, 
-                                                       y_train = targ_y)]
-        
-        for i in range(len(self.hidden_layers), -1, -1):
-            next_hidden_layer = self.hidden_layers[i]
-            delta_next_layer = next_hidden_layer.backward(self.lr, 
+        delta_next_layer = self.output_layer.backward(self.lr, 
+                                                      y_train = targ_y)
+        next_hidden_layer = self.output_layer
+        for i in range(len(self.hidden_layers)-1, -1, -1):
+            
+            current_hidden_layer = self.hidden_layers[i]
+            delta_next_layer = current_hidden_layer.backward(self.lr, 
                                                         next_deltas = delta_next_layer,
                                                         next_weights = next_hidden_layer.weight_matrix)
+            next_hidden_layer = current_hidden_layer
+        
         self.input_layer.backward(self.lr,
                                   next_deltas = delta_next_layer,
                                   next_weights= next_hidden_layer.weight_matrix)
 
-        print("Backward done (nothing done yet)")
         
 
     def pred(self, rows):
