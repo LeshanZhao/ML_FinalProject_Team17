@@ -27,12 +27,12 @@ size = 13
 h_num = 2000
 
 # Running on top 2000 rows currently, just to save time with debugging
-
+"""
 # TODO: Test NN functionality
 iden = np.identity(n = size)
-layer_in_test = layer.Layer(size, size, include_bias = False, weights = iden)
-layer_h_test = layer.Layer(num_perceptrons = 4, num_inputs = size)
-layer_o_test = layer.Layer(num_perceptrons = 1, num_inputs = 4)
+layer_in_test = layer.Layer(size, size, is_input_layer = True)
+layer_h_test = layer.Layer(num_perceptrons = 2, num_inputs = size)
+layer_o_test = layer.Layer(num_perceptrons = 1, num_inputs = 2)
 
 # TODO: add number of epochs and lr as NN param...
 
@@ -42,7 +42,7 @@ y_val = y_train.iloc[1]
 lr = .5
 
 
-for e in range(200):
+for e in range(20):
     for i in range(100):
         x_val = X_train.iloc[i]
         y_val = y_train.iloc[i]
@@ -54,9 +54,9 @@ for e in range(200):
     
         d_o = layer_o_test.backward(lr = lr, y_train = y_val)
         d_h = layer_h_test.backward(lr, next_deltas = d_o, next_weights = layer_o_test.weight_matrix)
-        d_i = layer_in_test.backward(lr, 
-                             next_deltas = d_h, 
-                             next_weights = layer_h_test.weight_matrix)
+        #d_i = layer_in_test.backward(lr, 
+        #                     next_deltas = d_h, 
+        #                     next_weights = layer_h_test.weight_matrix)
 
 
 
@@ -91,6 +91,7 @@ print(get_acc(pred_y, y_head))
 x_val = X_train.iloc[2]
 y_val = y_train.iloc[2]
 lr = 5
+# TODO: For whatever reason, we are gravitating towards y=.5 ...?
 
 lay_out = layer_in_test.forward(x_val)
 lay_out2 = layer_h_test.forward(lay_out)
