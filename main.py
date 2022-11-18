@@ -12,9 +12,18 @@ import layer
 from perceptron import *
 import random
 import mlp
+import cProfile
+import pstats
+import io
+from pstats import SortKey
 
 def get_acc(pred, y):
     return (1 - np.sum(abs(np.array(y) - np.array(pred))) / len(y)) * 100
+
+
+ob = cProfile.Profile()
+ob.enable()
+
 
 random.seed(12321)
 
@@ -228,21 +237,36 @@ y_try = y_train.head(50)
 #x_smoke = smoke_col.head(500)
 #y_try = y_train.head(500)
 
-lr = 1
+lr = .5
 
 #my_little_perceptron.print_network()
-#my_little_perceptron = mlp.MLP(num_features = size, num_hidden_layers = 1, hidden_sizes = [6])
+my_new_perceptron = mlp.MLP(num_features = size, num_hidden_layers = 1, hidden_sizes = [6])
 
-#my_little_perceptron = mlp.MLP(num_features = size, num_hidden_layers = 1, hidden_sizes = [3])
-
-
-out = my_little_perceptron.train(X_try, y_try, epochs  = 1000, lr = lr, batch_size = len(y_try))
-
-out = my_little_perceptron.pred(X_try) #, y_try)
-
-print("Output:",out)
-print("Actual:\n" + str(y_try))
-
-print(get_acc(out, y_try))
+#my_new_perceptron = mlp.MLP(num_features = size, num_hidden_layers = 1, hidden_sizes = [3])
 
 
+#out = my_new_perceptron.train(X_train, y_train, epochs  = 1, lr = lr, batch_size = len(y_try))
+
+out = my_new_perceptron.pred(X_train) #, y_try)
+
+out_test = my_new_perceptron.pred(X_test.head(100)) #, y_try)
+
+
+#print("Output:",out)
+#print("Actual:\n" + str(y_train))
+#print("Test Output:", out_test)
+#print("Test Actual:\n" + str(y_test))
+
+#print(get_acc(out, y_train))
+
+
+ob.disable()
+sec = io.StringIO()
+sortby = SortKey.CUMULATIVE
+ps = pstats.Stats(ob, stream=sec).sort_stats("tottime")
+ps.print_stats(15)
+ps = pstats.Stats(ob, stream=sec).sort_stats("cumtime")
+ps.print_stats(15)
+
+
+print(sec.getvalue())

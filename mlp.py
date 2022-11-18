@@ -76,6 +76,8 @@ class MLP:
     def train(self, X, y, lr = None, batch_size = 25, epochs = None):
         if epochs is None:
             epochs = self.n_epochs
+        # May want to run with this idea instead for sake of efficiency   
+        #X.apply(self.train_row_funcs, axis=1)
         
         for i in range(int(X.shape[0]/batch_size)):
             # Runs training on batches of 25
@@ -85,6 +87,10 @@ class MLP:
                     y_targ = y.iloc[j]
                     self.train_row(row, y_targ, lr)
 
+    # Could curry stuff...
+    def train_row_funcs(self, row):
+        return 
+    
     def train_row(self, row, y_targ, lr = None):
         self._forward(row)
         self._backward(y_targ, lr)
@@ -132,12 +138,12 @@ class MLP:
         
 
     def pred(self, rows):
-        Y = []
-        for i in range(rows.shape[0]): 
-            row = rows.iloc[i]
-            y = self.pred_row(row)
-            Y.append(y)
-        return Y
+        #Y = []
+        #for i in range(rows.shape[0]): 
+        #    row = rows.iloc[i]
+        #    y = self.pred_row(row)
+        #    Y.append(y)
+        return rows.apply(self.pred_row, axis=1)
 
     def pred_row(self, row):
        return self._forward(row)

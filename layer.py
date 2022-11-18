@@ -31,24 +31,34 @@ class Layer:
     def forward(self, layer_input):
         # Gets output of hidden layer based on layer_input
         #self.layer_input = layer_input
+        
+        """
+        # If we add bias, we do it another way...
         output = []
         
         if self.bias:
             output.append(1)
             
+        """
+        
         if self.is_input:
             # We just have 1 input per node...
             # Weights are list not matrix
+            """
             for i in range(len(self.node_list)):
                 w_i = self.weight_matrix[i] # w_i is List of length 1
                 perc  = self.node_list[i]
                 
                 # Putting these a 1 element lists for sake of np.dot
                 output.append(perc.pred(w_i, [layer_input[i]])) #Ternary???
-            return output
+            """
+            # List comprehension. Speed
+            layer_input = [np.array([lay])for lay in layer_input]
+            return [self.node_list[i].pred(self.weight_matrix[i], layer_input[i]) for i in range(len(self.node_list))]
         
         # If we are not input...
         
+        """
         # Has each percepton do a prediction
         for i in range(len(self.node_list)):
             w_row = self.weight_matrix[i]
@@ -56,8 +66,10 @@ class Layer:
             
             # For node node_list[i], weight_matrix[i] is corresponding weights
             output.append(perc.pred(layer_input, w_row))
+        """
+        # List comprehension is faster
+        return [self.node_list[i].pred(layer_input, self.weight_matrix[i]) for i in range(len(self.node_list))]
             
-        return output
         
         #return [perc.predict(np.dot(w_row, layer_input)) for w_row, perc in zip(weight_matrix, perceptron_list)]        
         
@@ -68,6 +80,8 @@ class Layer:
         ## If output layer... mul_term = (y_train - o_k)
         ## Else: mul_term = sum([next_weights[i][h]*delta[h] for i in range(len(delta))]) 
         # TODO: Back prop for input layer
+        weight_max = 13
+        
         deltas = self.compute_deltas(next_deltas, next_weights, y_train)
         
         if self.is_input:
@@ -78,6 +92,8 @@ class Layer:
                 
                 w_change = lr*np.array(delt)*feature
                 
+                if abs(self.weight_matrix[i][0] + w_change) >= weight_max:
+                    continue
                 self.weight_matrix[i][0] += w_change
             return deltas # No need to return anything... input layer
         
@@ -88,6 +104,8 @@ class Layer:
             # I think this should change weight matrix via mutation... 
             # Can come back later to confirm. Things seem to be changing
             for i in range(len(weight_list)):
+                if abs(weight_list[i] + w_change) >= weight_max:
+                    continue
                 weight_list[i] += w_change[i]
         
         # Returns deltas so they can be used for earlier layer back prop

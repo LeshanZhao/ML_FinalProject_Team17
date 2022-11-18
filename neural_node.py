@@ -20,9 +20,12 @@ class Neural_Node:
         self.act_func = func
 
             
-    # Gonna do dot product before this piece...
+    # Gonna x and w need to be np arrays
     def pred(self, x, w):
         self.x_j = x
+        
+        """
+        # I think I avoided the overflows a different way
         act_input = np.dot(x, w)
         
         # Prevent the overflow error
@@ -32,7 +35,9 @@ class Neural_Node:
             self.output = 0
         else:    
             self.output = self.act_func(act_input)
+        #"""
         
+        self.output = self.act_func(np.dot(x, w))
         return self.output
     
     
