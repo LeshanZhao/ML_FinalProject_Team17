@@ -217,5 +217,12 @@ size = 13
 x_val = X_train.iloc[j]
 y_val = y_train.iloc[j]
 
+X_try = X_train.head(5)
+y_try = y_train.head(5)
+
 my_little_perceptron = mlp.MLP(num_features = size, num_hidden_layers = 1, hidden_sizes = [5])
-my_little_perceptron._forward(x_val)
+out = my_little_perceptron.train(X_try, y_try)
+
+print("Output:",out)
+print("Actual:",y_val)
+

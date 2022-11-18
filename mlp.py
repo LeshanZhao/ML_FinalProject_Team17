@@ -72,7 +72,9 @@ class MLP:
 
 
     def train(self, X, y):
-        for row, y_targ in zip(X, y):
+        for i in range(X.shape[0]):
+            row = X.iloc[i]
+            y_targ = y.iloc[i]
             self.train_row(row, y_targ)
 
     def train_row(self, row, y_targ):
@@ -117,7 +119,8 @@ class MLP:
 
     def pred(self, rows):
         Y = []
-        for row in rows: 
+        for i in range(rows.shape[0]): 
+            row = rows.iloc[i]
             y = self.pred_row(row)
             Y.append(y)
         return Y
