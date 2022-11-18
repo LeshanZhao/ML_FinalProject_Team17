@@ -13,7 +13,7 @@ from perceptron import *
 import random
 from mlp import MLP
 
-random.seed(12321)
+# random.seed(12321)
 
 data = data_opener.get_data()
 
@@ -47,6 +47,11 @@ layer_o_test = layer.Layer(num_perceptrons = 1,
 mlp_1 = MLP(num_features=size,
             num_hidden_layers=1,
             hidden_sizes=[2])
+mlp_1.dep__init__(layer_in_test, 
+                  layer_o_test, 
+                  [layer_h_test], 
+                  X_train, y_train, 1)
+mlp_1.print_network()
 
 
 """

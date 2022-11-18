@@ -47,18 +47,23 @@ class MLP:
             
 
     def print_network(self):
-        for i, layer in enumerate([self.input_layer] + self.hidden_layers + [self.output_layer]):
+        layers = [self.input_layer] + self.hidden_layers + [self.output_layer]
+        #  + self.hidden_layers + list(self.output_layer)
+        for i, layer in enumerate(layers):
             if (layer.is_input):
-                print("Input Layer: ",end='')
+                print("\nInput Layer: ",end='\n')
             elif (len(layer.node_list) == 1):
-                print("Output Layer: ",end='')
+                print("\nOutput Layer: ",end='\n')
             else:
-                print("Hidden Layer " + str(i) + ": ", end='')
+                print("\nHidden Layer " + str(i) + ": ", end='\n')
             
             for j, node in enumerate (layer.node_list):
-                print("Node_" + str(j) + "-", end='\t')
-                print(str(node.output))
-
+                print("\tNode_" + str(j) + ": ", end='')
+                print("\tweights: " + str(layer.weight_matrix[j]))
+                # print("\tOutput: " + str(1))
+            
+            # for weights in layer.weight_matrix:
+            #     print(weights)
 
 
     def train(self, X, y):
