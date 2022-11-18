@@ -11,7 +11,7 @@ import data_opener
 import layer
 from perceptron import *
 import random
-
+import mlp
 
 def get_acc(pred, y):
     return (1 - np.sum(abs(np.array(y) - np.array(pred))) / len(y)) * 100
@@ -29,6 +29,7 @@ X_train, X_test, X_val, y_train, y_test, y_val = data_opener.train_test_val_spli
 
 size = 13
 h_num = 2000
+care_for = 20
 
 # Running on top 2000 rows currently, just to save time with debugging
 """
@@ -128,12 +129,12 @@ x_val = X_train.iloc[n]
 y_val = y_train.iloc[n]
 lr = 5
 
-layer_i_test = layer.Layer(size, size, is_input_layer = True)
-layer_h1_test = layer.Layer(num_perceptrons = h1_size, num_inputs = size)
-layer_o_test = layer.Layer(num_perceptrons = 1, num_inputs = h1_size)
+#layer_i_test = layer.Layer(size, size, is_input_layer = True)
+#layer_h1_test = layer.Layer(num_perceptrons = h1_size, num_inputs = size)
+#layer_o_test = layer.Layer(num_perceptrons = 1, num_inputs = h1_size)
 
 for i in range(200):
-    for j in range(10):
+    for j in range(care_for):
         x_val = X_train.iloc[j]
         y_val = y_train.iloc[j]
         lay_out = layer_i_test.forward(x_val)
@@ -153,8 +154,7 @@ for i in range(200):
                                     next_deltas = d_h1, 
                                     next_weights = layer_h1_test.weight_matrix)
 #"""
-
-care_for = 10
+"""
 pred_y = []
 
 y_head = [y_train.iloc[i] for i in range(care_for)]
@@ -184,7 +184,7 @@ print(get_acc(pred_y, y_head))
 
 #acc_train = sum(pred_train == y_train)/len(y_train)
 #acc_test = sum(pred_test == y_test)/len(y_test)
-
+"""
 #print(acc_train)
 #print(acc_test)
 h1_size = 5
@@ -193,7 +193,7 @@ lr = 1
 #layer_h1_test = layer.Layer(num_perceptrons = h1_size, num_inputs = size)
 #layer_o_test = layer.Layer(num_perceptrons = 1, num_inputs = h1_size)
 
-for j in range(10):
+for j in range(care_for):
     x_val = X_train.iloc[j]
     y_val = y_train.iloc[j]
     lay_out = layer_i_test.forward(x_val)
@@ -213,4 +213,27 @@ for j in range(10):
                                 next_deltas = d_h1, 
                                 next_weights = layer_h1_test.weight_matrix)
 #"""
+size = 13
+x_val = X_train.iloc[j]
+y_val = y_train.iloc[j]
+
+bs = 25
+
+X_try = X_train.head(100) #[y_train == 0]
+y_try = y_train.head(100)
+
+lr = 1
+
+#my_little_perceptron.print_network()
+#my_little_perceptron = mlp.MLP(num_features = size, num_hidden_layers = 3, hidden_sizes = [15, 12, 10])
+
+out = my_little_perceptron.train(X_try, y_try, epochs  = 50, lr = lr, batch_size = bs)
+
+out = my_little_perceptron.pred(X_try) #, y_try)
+
+print("Output:",out)
+print("Actual:\n" + str(y_try))
+
+print(get_acc(out, y_try))
+
 
