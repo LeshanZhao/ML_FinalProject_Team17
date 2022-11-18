@@ -32,7 +32,6 @@ class MLP:
         # hidden_sizes = list of integers of length num_hidden_layers. 
         #     hidden_sizes[i] = size of hidden_layer i
         #     hidden_sizes[i - 1] = number of inputs for hidden_layer i
-        
         # TODO: build the different layers here using the constructor in Layer class
         self.num_features = num_features
         self.input_layer= Layer(num_features, num_features, is_input_layer = True)
