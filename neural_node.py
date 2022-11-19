@@ -24,7 +24,7 @@ class Neural_Node:
     def pred(self, x, w):
         self.x_j = x
         
-        """
+        
         # I think I avoided the overflows a different way
         act_input = np.dot(x, w)
         
@@ -37,7 +37,7 @@ class Neural_Node:
             self.output = self.act_func(act_input)
         #"""
         
-        self.output = self.act_func(np.dot(x, w))
+        #self.output = self.act_func(np.dot(x, w))
         return self.output
     
     

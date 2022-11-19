@@ -29,7 +29,8 @@ class MLP:
                 num_hidden_layers, 
                 hidden_sizes, 
                 n_epochs = 1, 
-                lr = 1):
+                lr = 1,
+                include_bias = False):
         # num_features is number of features we will have. Size of input layer
         # num_hidden_layers = number of hidden layers we will have
         # hidden_sizes = list of integers of length num_hidden_layers. 
@@ -39,18 +40,20 @@ class MLP:
         self.num_features = num_features
         self.lr = lr
         self.n_epochs = n_epochs
+        
+        bias = (1 if include_bias else 0)
 
-        self.input_layer= Layer(num_features, num_features, is_input_layer = True)
+        self.input_layer= Layer(num_features, num_features, is_input_layer = True, include_bias = include_bias)
 
         self.hidden_layers = []
         for j in range(num_hidden_layers):
             if j == 0:
-                layer = Layer(hidden_sizes[j], self.num_features)
+                layer = Layer(hidden_sizes[j], self.num_features + bias, include_bias = include_bias)
             else: 
-                layer = Layer(hidden_sizes[j], hidden_sizes[j-1])  
+                layer = Layer(hidden_sizes[j], hidden_sizes[j-1] + bias, include_bias = include_bias)  
             self.hidden_layers.append(layer)
         
-        self.output_layer = Layer(1, hidden_sizes[-1]) 
+        self.output_layer = Layer(1, hidden_sizes[-1] + bias) 
             
 
     def print_network(self):
@@ -123,7 +126,7 @@ class MLP:
         if lr is None:
             lr = self.lr
         # TODO
-        delta_next_layer = self.output_layer.backward(self.lr, 
+        delta_next_layer = self.output_layer.backward(lr, 
                                                       y_train = targ_y)
         next_hidden_layer = self.output_layer
         
@@ -131,12 +134,12 @@ class MLP:
         for i in range(len(self.hidden_layers)-1, -1, -1):
             
             current_hidden_layer = self.hidden_layers[i]
-            delta_next_layer = current_hidden_layer.backward(self.lr, 
+            delta_next_layer = current_hidden_layer.backward(lr, 
                                                         next_deltas = delta_next_layer,
                                                         next_weights = next_hidden_layer.weight_matrix)
             next_hidden_layer = current_hidden_layer
         
-        self.input_layer.backward(self.lr,
+        self.input_layer.backward(lr,
                                   next_deltas = delta_next_layer,
                                   next_weights= next_hidden_layer.weight_matrix)
 
