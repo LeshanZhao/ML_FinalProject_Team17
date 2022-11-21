@@ -29,7 +29,8 @@ class MLP:
                 num_hidden_layers, 
                 hidden_sizes, 
                 n_epochs = 1, 
-                lr = 1):
+                lr = 1,
+                include_bias = False):
         # num_features is number of features we will have. Size of input layer
         # num_hidden_layers = number of hidden layers we will have
         # hidden_sizes = list of integers of length num_hidden_layers. 
@@ -39,18 +40,20 @@ class MLP:
         self.num_features = num_features
         self.lr = lr
         self.n_epochs = n_epochs
+        
+        bias = (1 if include_bias else 0)
 
-        self.input_layer= Layer(num_features, num_features, is_input_layer = True)
+        self.input_layer= Layer(num_features, num_features, is_input_layer = True, include_bias = include_bias)
 
         self.hidden_layers = []
         for j in range(num_hidden_layers):
             if j == 0:
-                layer = Layer(hidden_sizes[j], self.num_features)
+                layer = Layer(hidden_sizes[j], self.num_features + bias, include_bias = include_bias)
             else: 
-                layer = Layer(hidden_sizes[j], hidden_sizes[j-1])  
+                layer = Layer(hidden_sizes[j], hidden_sizes[j-1] + bias, include_bias = include_bias)  
             self.hidden_layers.append(layer)
         
-        self.output_layer = Layer(1, hidden_sizes[-1]) 
+        self.output_layer = Layer(1, hidden_sizes[-1] + bias) 
             
 
     def print_network(self):
@@ -76,7 +79,8 @@ class MLP:
     def train(self, X, y, lr = None, batch_size = 25, epochs = None):
         if epochs is None:
             epochs = self.n_epochs
-        
+        [self.train_df(X, y, lr) for e in range(epochs)]
+        """
         for i in range(int(X.shape[0]/batch_size)):
             # Runs training on batches of 25
             for e in range(epochs):
@@ -84,7 +88,14 @@ class MLP:
                     row = X.iloc[j]
                     y_targ = y.iloc[j]
                     self.train_row(row, y_targ, lr)
-
+        """
+        
+    def train_df(self, X, y, lr):
+        # Uses lexical scoping and list comprehensions.
+        # Right now, batch size unused. Still have overhead here, but better than before
+        func_series = X.apply(lambda row: (lambda y: self.train_row(row, y, lr)), axis=1)
+        [func_series.iloc[i](y.iloc[i]) for i in range(len(y))]
+    
     def train_row(self, row, y_targ, lr = None):
         self._forward(row)
         self._backward(y_targ, lr)
@@ -95,15 +106,16 @@ class MLP:
 
 
         # hidden layers
+        # TODO: Remove some overhead getting rid of for loop in some way 
         for nxt_hidden_layer in self.hidden_layers:
             y_last_layer = nxt_hidden_layer.forward(y_last_layer)
-
+        
         y_output_layer_list = self.output_layer.forward(y_last_layer)
 
         
         output_result = y_output_layer_list[0]
         
-        #return output_result #TODO revert
+        return output_result #TODO revert
         if output_result >= .5:
             return 1
         else:
@@ -114,30 +126,32 @@ class MLP:
         if lr is None:
             lr = self.lr
         # TODO
-        delta_next_layer = self.output_layer.backward(self.lr, 
+        delta_next_layer = self.output_layer.backward(lr, 
                                                       y_train = targ_y)
         next_hidden_layer = self.output_layer
+        
+        # TODO: Remove for loop overhead? 
         for i in range(len(self.hidden_layers)-1, -1, -1):
             
             current_hidden_layer = self.hidden_layers[i]
-            delta_next_layer = current_hidden_layer.backward(self.lr, 
+            delta_next_layer = current_hidden_layer.backward(lr, 
                                                         next_deltas = delta_next_layer,
                                                         next_weights = next_hidden_layer.weight_matrix)
             next_hidden_layer = current_hidden_layer
         
-        self.input_layer.backward(self.lr,
+        self.input_layer.backward(lr,
                                   next_deltas = delta_next_layer,
                                   next_weights= next_hidden_layer.weight_matrix)
 
         
 
     def pred(self, rows):
-        Y = []
-        for i in range(rows.shape[0]): 
-            row = rows.iloc[i]
-            y = self.pred_row(row)
-            Y.append(y)
-        return Y
+        #Y = []
+        #for i in range(rows.shape[0]): 
+        #    row = rows.iloc[i]
+        #    y = self.pred_row(row)
+        #    Y.append(y)
+        return rows.apply(self.pred_row, axis=1)
 
     def pred_row(self, row):
        return self._forward(row)
