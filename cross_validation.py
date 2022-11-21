@@ -13,8 +13,7 @@ class cross_validation:
         self.y = dataset.iloc[:,[-1]]
         self.X = dataset.drop(self.y,axis = 1)
 
-        return
-
+        
     def train_test_split(self, features, targ, test_size=0.2, random_state=9208):
         #find the train percentage
         train_percentage = (1 - test_size) * 100
