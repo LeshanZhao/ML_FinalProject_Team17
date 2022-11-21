@@ -21,7 +21,7 @@ class Neural_Node:
 
             
     # Gonna x and w need to be np arrays
-    def pred(self, x, w):
+    def pred(self, x = 1, w = 1): # Setting defaults so order doesnt get goofed up on accident
         self.x_j = x
         
         
@@ -30,9 +30,9 @@ class Neural_Node:
         
         # Prevent the overflow error
         if act_input >= 500:
-            self.output = 1
+            self.output = .999
         elif act_input <= -500:
-            self.output = 0
+            self.output = 0.001
         else:    
             self.output = self.act_func(act_input)
         #"""

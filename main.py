@@ -232,36 +232,32 @@ size = 13
 
 bs = 25
 
-X0 = X_train[y_train == 0].head(10) #[y_train == 0]
-y0 = y_train[y_train == 0].head(10)
+X0 = X_train[np.logical_and(y_train == 0, np.logical_and(X_train["active"] == 0, X_train["smoke"] == 1))].head(2) #[y_train == 0]
+y0 = y_train[np.logical_and(y_train == 0, np.logical_and(X_train["active"] == 0, X_train["smoke"] == 1))].head(2)
 
 
-X1 = X_train[y_train == 1].head(10) #[y_train == 0]
-y1 = y_train[y_train == 1].head(10)
+X1 = X_train[np.logical_and(y_train == 1, np.logical_and(X_train["active"] == 1, X_train["smoke"] == 0))].head(2) #[y_train == 0]
+y1 = y_train[np.logical_and(y_train == 1, np.logical_and(X_train["active"] == 1, X_train["smoke"] == 0))].head(2)
 
 
-X_try = X_train.head(20000).tail(200)
-y_try = y_train.head(20000).tail(200)
+X_try = X_train.head(120).tail(10)
+y_try = y_train.head(120).tail(10)
 #x_smoke = smoke_col.head(500)
 #y_try = y_train.head(500)
 
-lr = .01
+lr = .1
 
 #my_little_perceptron.print_network()
-#my_new_perceptron = mlp.MLP(num_features = size, num_hidden_layers = 2, hidden_sizes = [8, 4], include_bias = True)
-
-#my_new_perceptron = mlp.MLP(num_features = size, num_hidden_layers = 1, hidden_sizes = [3])
 
 
-out = my_new_perceptron.train(X_try, y_try, epochs  = 1000, lr = lr)
+#my_new_perceptron = mlp.MLP(num_features = 2, num_hidden_layers = 0, hidden_sizes = [4], include_bias = True)
+
+#my_new_perceptron = mlp.MLP(num_features = size, num_hidden_layers = 1, hidden_sizes = [6])
+
+my_new_perceptron.train(X_try, y_try, epochs  = 100, lr = lr)
 
 out = my_new_perceptron.pred(X_try) #, y_try)
 
-#out_test = my_new_perceptron.pred(X_test) #, y_try)
-
-
-#print("Output:",out)
-#print("Actual:\n" + str(y_try))
 out2 = list(map(lambda x: 1 if x >= .5 else 0, out))
 
 for o, y_i in zip(out, y_try):
@@ -272,6 +268,39 @@ for o, y_i in zip(out, y_try):
 
 print(get_acc(out2, y_try))
 
+'''
+#[["smoke", "active"]]
+for i in range(200):
+    out = my_new_perceptron.train(X0[["height", "smoke"]], y0, epochs  = 1, lr = lr)
+    out = my_new_perceptron.train(X1[["height", "smoke"]], y1, epochs  = 1, lr = lr)
+
+
+out = my_new_perceptron.pred(X0[["height", "smoke"]]) #, y_try)
+
+#out_test = my_new_perceptron.pred(X_test) #, y_try)
+
+
+#print("Output:",out)
+#print("Actual:\n" + str(y_try))
+out2 = list(map(lambda x: 1 if x >= .5 else 0, out))
+
+for o, y_i in zip(out, y0):
+    print(str(o), "", str(y_i))
+#print("Test Output:", out_test)
+#print("Test Actual:\n" + str(y_test))
+
+
+print(get_acc(out2, y0))
+
+
+out = my_new_perceptron.pred(X1[["height", "smoke"]]) #, y_try)
+
+out2 = list(map(lambda x: 1 if x >= .5 else 0, out))
+
+for o, y_i in zip(out, y1):
+    print(str(o), "", str(y_i))
+print(get_acc(out2, y1))
+#'''
 '''
 ob.disable()
 sec = io.StringIO()

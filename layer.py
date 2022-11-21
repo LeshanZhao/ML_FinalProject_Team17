@@ -63,7 +63,7 @@ class Layer:
             layer_input = [np.array([lay])for lay in layer_input]
             if self.bias:
                 layer_input.insert(0, np.array([0]))
-            return [self.node_list[i].pred(self.weight_matrix[i], layer_input[i]) for i in range(len(self.node_list))]
+            return [self.node_list[i].pred(x = layer_input[i], w = self.weight_matrix[i]) for i in range(len(self.node_list))]
         
         # If we are not input...
         
@@ -77,7 +77,7 @@ class Layer:
             output.append(perc.pred(layer_input, w_row))
         """
         # List comprehension is faster
-        return [self.node_list[i].pred(layer_input, self.weight_matrix[i]) for i in range(len(self.node_list))]
+        return [self.node_list[i].pred(x = layer_input, w = self.weight_matrix[i]) for i in range(len(self.node_list))]
             
         
         #return [perc.predict(np.dot(w_row, layer_input)) for w_row, perc in zip(weight_matrix, perceptron_list)]        
@@ -127,7 +127,7 @@ class Layer:
     def alter_weights_non_input(self, lr, weight_max, node, delt, weight_list):
         x_j = node.x_j 
         
-        w_change = lr*np.array(delt)*np.array(x_j) + self.prev_weight_change*self.alpha
+        w_change = lr*np.array(delt)*np.array(x_j) #+ self.prev_weight_change*self.alpha
         
         self.prev_weight_change = w_change
 
@@ -147,12 +147,10 @@ class Layer:
             # Going to use threshold only here to see if progress...
             mul_term = (y_train - o_k)
 
-            #if (o_k >= 0.5 and y_train == 1) or (o_k < .5 and y_train == 0):
-            #    mul_term = mul_term
-            #    d_k = self.compute_delta_helper(o_k, mul_term)
+            #if o_k >= .5:
+            #    mul_term = (y_train - 1)
             #else:
-            #    mul_term = 2*(y_train - .5)
-            #    d_k = self.compute_delta_helper(.5, mul_term)
+            #    mul_term = y_train
 
             
             d_k = self.compute_delta_helper(o_k, mul_term)
@@ -202,7 +200,7 @@ class Layer:
         for i in range(num_perceptrons):
             p_weights = []
             for j in range(num_inputs):
-                p_weights.append(random.randrange(-num_inputs, num_inputs + 1))
+                p_weights.append(random.randrange(-num_perceptrons, num_perceptrons + 1))
             weights.append(p_weights)
             
         return weights

@@ -44,16 +44,19 @@ class MLP:
         bias = (1 if include_bias else 0)
 
         self.input_layer= Layer(num_features, num_features, is_input_layer = True, include_bias = include_bias)
-
+        
+        last_size = num_features + bias
+        
         self.hidden_layers = []
         for j in range(num_hidden_layers):
             if j == 0:
-                layer = Layer(hidden_sizes[j], self.num_features + bias, include_bias = include_bias)
+                layer = Layer(hidden_sizes[j], last_size, include_bias = include_bias)
             else: 
-                layer = Layer(hidden_sizes[j], hidden_sizes[j-1] + bias, include_bias = include_bias)  
+                layer = Layer(hidden_sizes[j], last_size, include_bias = include_bias)  
+            last_size = hidden_sizes[j] + bias
             self.hidden_layers.append(layer)
         
-        self.output_layer = Layer(1, hidden_sizes[-1] + bias) 
+        self.output_layer = Layer(1, last_size) 
             
 
     def print_network(self):
