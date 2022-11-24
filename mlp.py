@@ -44,16 +44,19 @@ class MLP:
         bias = (1 if include_bias else 0)
 
         self.input_layer= Layer(num_features, num_features, is_input_layer = True, include_bias = include_bias)
-
+        
+        last_size = num_features + bias
+        
         self.hidden_layers = []
         for j in range(num_hidden_layers):
             if j == 0:
-                layer = Layer(hidden_sizes[j], self.num_features + bias, include_bias = include_bias)
+                layer = Layer(hidden_sizes[j], last_size, include_bias = include_bias)
             else: 
-                layer = Layer(hidden_sizes[j], hidden_sizes[j-1] + bias, include_bias = include_bias)  
+                layer = Layer(hidden_sizes[j], last_size, include_bias = include_bias)  
+            last_size = hidden_sizes[j] + bias
             self.hidden_layers.append(layer)
         
-        self.output_layer = Layer(1, hidden_sizes[-1] + bias) 
+        self.output_layer = Layer(1, last_size) 
             
 
     def print_network(self):
@@ -80,6 +83,8 @@ class MLP:
         if epochs is None:
             epochs = self.n_epochs
         [self.train_df(X, y, lr) for e in range(epochs)]
+        
+        
         """
         for i in range(int(X.shape[0]/batch_size)):
             # Runs training on batches of 25
@@ -95,10 +100,21 @@ class MLP:
         # Right now, batch size unused. Still have overhead here, but better than before
         func_series = X.apply(lambda row: (lambda y: self.train_row(row, y, lr)), axis=1)
         [func_series.iloc[i](y.iloc[i]) for i in range(len(y))]
+        
+        # After doing all the rows in the batch, alter weights...
+        # Rather than alter weights every time.
+        self.do_weight_changes()
     
     def train_row(self, row, y_targ, lr = None):
         self._forward(row)
         self._backward(y_targ, lr)
+        
+    def do_weight_changes(self):
+        self.input_layer.do_weight_change()
+        self.output_layer.do_weight_change()
+        
+        for layer in self.hidden_layers:
+            layer.do_weight_change()
 
     def _forward(self,row):
         # get output from input layer
@@ -157,6 +173,11 @@ class MLP:
        return self._forward(row)
         
 
+    def loss(self, rows, targ):
+        preds = self.pred(rows)
+        
+        return sum((preds - targ)**2)
+        
     
     
     

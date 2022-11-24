@@ -31,7 +31,8 @@ class Layer:
         else:
             # Initialize weights on U(-num_perc, num_perc). 
             self.weight_matrix = self.build_weight_matrix(num_perceptrons + bias, num_inputs)
-            
+        
+        self.weight_changes = np.zeros(self.weight_matrix.shape)
         
     def forward(self, layer_input):
         # Gets output of hidden layer based on layer_input
@@ -63,7 +64,7 @@ class Layer:
             layer_input = [np.array([lay])for lay in layer_input]
             if self.bias:
                 layer_input.insert(0, np.array([0]))
-            return [self.node_list[i].pred(self.weight_matrix[i], layer_input[i]) for i in range(len(self.node_list))]
+            return [self.node_list[i].pred(x = layer_input[i], w = self.weight_matrix[i]) for i in range(len(self.node_list))]
         
         # If we are not input...
         
@@ -77,7 +78,7 @@ class Layer:
             output.append(perc.pred(layer_input, w_row))
         """
         # List comprehension is faster
-        return [self.node_list[i].pred(layer_input, self.weight_matrix[i]) for i in range(len(self.node_list))]
+        return [self.node_list[i].pred(x = layer_input, w = self.weight_matrix[i]) for i in range(len(self.node_list))]
             
         
         #return [perc.predict(np.dot(w_row, layer_input)) for w_row, perc in zip(weight_matrix, perceptron_list)]        
@@ -100,12 +101,13 @@ class Layer:
                 delt = deltas[i]
                 feature = node.x_j[0]
                 
-                w_change = lr*np.array(delt)*feature + self.prev_weight_change*self.alpha
+                w_change = lr*np.array(delt)*feature #+ self.prev_weight_change*self.alpha
                 
-                self.prev_weight_change = w_change
-                #if abs(self.weight_matrix[i][0] + w_change) >= weight_max:
-                #    continue
+                #self.prev_weight_change = w_change
+                '''
                 self.weight_matrix[i][0] += w_change
+                '''
+                self.weight_changes[i] = w_change + self.weight_changes[i]
             return deltas # No need to return anything... input layer
         """
         for node, delt, weight_list in zip(self.node_list, deltas, self.weight_matrix):
@@ -118,25 +120,32 @@ class Layer:
                     continue
                 weight_list[i] += w_change[i]
         """
-        [self.alter_weights_non_input(lr, weight_max, self.node_list[i], deltas[i], self.weight_matrix[i]) for i in range(len(deltas))]
+        [self.alter_weights_non_input(lr, weight_max, self.node_list[i], deltas[i], self.weight_matrix[i], i) for i in range(len(deltas))]
         # Returns deltas so they can be used for earlier layer back prop
         return deltas
     
     # Helper function for backward
     # Calling it for its side effects
-    def alter_weights_non_input(self, lr, weight_max, node, delt, weight_list):
+    def alter_weights_non_input(self, lr, weight_max, node, delt, weight_list, i):
         x_j = node.x_j 
         
-        w_change = lr*np.array(delt)*np.array(x_j) + self.prev_weight_change*self.alpha
+        w_change = lr*np.array(delt)*np.array(x_j) #+ self.prev_weight_change*self.alpha
         
-        self.prev_weight_change = w_change
-
-        # This wil change weight matrix via mutation. Slow though
+        self.weight_changes = np.array(w_change) + self.weight_changes
+        #self.prev_weight_change = w_change
+        '''
+        # This will change weight matrix via mutation. Slow though
         for i in range(len(weight_list)):
             #if abs(weight_list[i] + w_change[i]) >= weight_max:
             #    continue
             weight_list[i] += w_change[i]
-                
+        '''
+            
+    # TODO: I am making it determine the weight changes for multiple inputs
+    # then changing the list of weights afterwards.
+    def do_weight_change(self):
+        self.weight_matrix = self.weight_matrix + self.weight_changes
+        self.weight_changes = np.zeros(self.weight_matrix.shape)
     
     def compute_deltas(self, next_deltas = None, next_weights = None, y_train = None):
         # Output layer case
@@ -147,12 +156,10 @@ class Layer:
             # Going to use threshold only here to see if progress...
             mul_term = (y_train - o_k)
 
-            #if (o_k >= 0.5 and y_train == 1) or (o_k < .5 and y_train == 0):
-            #    mul_term = mul_term
-            #    d_k = self.compute_delta_helper(o_k, mul_term)
+            #if o_k >= .5:
+            #    mul_term = (y_train - 1)
             #else:
-            #    mul_term = 2*(y_train - .5)
-            #    d_k = self.compute_delta_helper(.5, mul_term)
+            #    mul_term = y_train
 
             
             d_k = self.compute_delta_helper(o_k, mul_term)
@@ -202,8 +209,8 @@ class Layer:
         for i in range(num_perceptrons):
             p_weights = []
             for j in range(num_inputs):
-                p_weights.append(random.randrange(-num_inputs, num_inputs + 1))
+                p_weights.append(random.randrange(-num_perceptrons, num_perceptrons + 1))
             weights.append(p_weights)
             
-        return weights
-            
+        return np.array(weights)
+
