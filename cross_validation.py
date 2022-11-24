@@ -23,14 +23,15 @@ class cross_validation:
         test_data_size = len(features) - (len(features) * test_percentage)
 
         #split the features and labels into test part and train part
-        X_train, y_train = features[:, train_data_size], targ[: , train_data_size]
-        X_test, y_test =  features[:, test_data_size], targ[:,test_data_size]
+        X_train, y_train = features[:train_data_size, :], targ[: train_data_size, :]
+        X_test, y_test =  features[: test_data_size,:], targ[: test_data_size,:]
 
         return X_train, X_test, y_train, y_test
    
 
     def createFold(self, start_index, fold_size):
-        return self.dataset.iloc[start_index:, fold_size:]
+        lastIndex = start_index + fold_size
+        return self.dataset.iloc[start_index:lastIndex, :] #slice the fold from the start index to fold size bu added the fold size ti index to see the last index in fold
 
     def Kfold (self, n_splits, shuffle = True):
         # Use n_splits to consider the number of folds 
@@ -43,8 +44,7 @@ class cross_validation:
         for i in n_splits:
             if shuffle == True: 
                 self.dataset = self.dataset.sample(frac = 1)
-
-            folds.append(self.createFold(i*fold_size, fold_size), shuffle)
+            folds.append(self.createFold(i*fold_size, fold_size))
         return folds
 
 
@@ -77,7 +77,7 @@ class cross_validation:
 def cross_val_score(self, cv=2, shuffle=True): 
         if shuffle == True: 
             folds = self.Kfold(cv, shuffle)
-        conf_matrix = [cv] 
+        conf_matrix = [] 
         for fold in folds: 
             conf_matrix.append(self.confusion_matrix())
         return conf_matrix
