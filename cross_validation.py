@@ -10,6 +10,7 @@ import pandas as pd
 class cross_validation: 
     def __init__(self, dataset) -> None:
         self.dataset = dataset
+        #split the dataset columns to features and label column
         self.y = dataset.iloc[:,[-1]]
         self.X = dataset.drop(self.y,axis = 1)
 
@@ -18,8 +19,8 @@ class cross_validation:
         train_percentage = (1 - test_size) * 100
         test_percentage = test_size * 100
         #find num of features using the percentage of both test and train
-        train_data_size = len(features) - (len(features) % train_percentage)
-        test_data_size = len(features) - (len(features) % test_percentage)
+        train_data_size = len(features) - (len(features) * train_percentage)
+        test_data_size = len(features) - (len(features) * test_percentage)
 
         #split the features and labels into test part and train part
         X_train, y_train = features[:, train_data_size], targ[: , train_data_size]
