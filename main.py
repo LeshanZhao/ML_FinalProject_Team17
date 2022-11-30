@@ -243,8 +243,8 @@ y1 = y_train[np.logical_and(y_train == 1, np.logical_and(X_train["active"] == 1,
 Xc = pd.concat([X0, X1])
 yc = pd.concat([y0, y1])
 
-X_try = X_train.head(1000).tail(20)
-y_try = y_train.head(1000).tail(20)
+X_try = X_train.head(100).tail(100)
+y_try = y_train.head(100).tail(100)
 
 Xc = X_try
 yc = y_try

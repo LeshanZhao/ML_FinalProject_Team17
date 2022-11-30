@@ -9,20 +9,6 @@ from layer import Layer
 import numpy as np
 
 class MLP:
-    def dep__init__(self, 
-                #Input_Layer: Layer, 
-                #Output_Layer: Layer,
-                #Hidden_Layers: list[Layer],
-                X,
-                y):
-        # TODO: instead of passing in layers, tell it how many layers and what sizes
-        # We should build the layers here
-        
-        self.input_layer = Input_Layer
-        self.output_layer = Output_Layer
-        self.hidden_layers = Hidden_Layers
-        self.X = X # TODO no need to initialize X and Y
-        self.y = y
 
     # TODO: Write the init function to take these parameters
     def __init__(self, 
