@@ -143,9 +143,11 @@ class Layer:
             
     # TODO: I am making it determine the weight changes for multiple inputs
     # then changing the list of weights afterwards.
-    def do_weight_change(self):
+
+    def update_weight_matrix(self):
         self.weight_matrix = self.weight_matrix + self.weight_changes
         self.weight_changes = np.zeros(self.weight_matrix.shape)
+    
     
     def compute_deltas(self, next_deltas = None, next_weights = None, y_train = None):
         # Output layer case
@@ -154,7 +156,7 @@ class Layer:
             o_k = node.output # Needs to be threshold?
             
             
-            mul_term = ((y_train)/o_k - (1-y_train)/(1-o_k))
+            mul_term = ( (y_train)/o_k - (1-y_train)/(1-o_k))
 
             #if o_k >= .5:
             #    mul_term = (y_train - 1)
