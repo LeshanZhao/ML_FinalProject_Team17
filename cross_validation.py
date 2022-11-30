@@ -53,7 +53,7 @@ class cross_validation:
         FalsePostive = []
         TrueNegative = []
         FalseNegative = []
-        for y, y_ in y_test, y_pred: 
+        for y, y_ in zip(y_test, y_pred): 
             if y == 1 and y_==1:
                 TruePostive.append(y)
             elif y == 0 and y_ == 0:
