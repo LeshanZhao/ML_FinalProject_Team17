@@ -67,10 +67,10 @@ for i in range(splits):
     
     cv.add_metrics(fold_nums = splits, y_pred = y_test_pred, y_test = y_test)
     
-print(cv.precision)
-print(cv.recall)
-print(cv.accuracy)
-print(cv.error)
+print("Precision:", cv.precision)
+print("Recall", cv.recall)
+print("Accuracy", cv.accuracy)
+print("Error", cv.error)
 
 
     
