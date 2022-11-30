@@ -110,6 +110,9 @@ class MLP:
         self._forward(row)
         self._backward(y_targ, lr)
         
+        # This line uncommented makes it do stochastic grad descent instead
+        #self.do_weight_changes()
+        
     def do_weight_changes(self):
         self.input_layer.do_weight_change()
         self.output_layer.do_weight_change()
@@ -132,17 +135,18 @@ class MLP:
         
         output_result = y_output_layer_list[0]
         
-        return output_result #TODO revert
+        return output_result #TODO revert to returning 0 or 1. Returns now to help debug
         if output_result >= .5:
             return 1
         else:
             return 0
         
     
+    # Does bacward prop for a given row/target
     def _backward(self, targ_y, lr = None):
         if lr is None:
             lr = self.lr
-        # TODO
+
         delta_next_layer = self.output_layer.backward(lr, 
                                                       y_train = targ_y)
         next_hidden_layer = self.output_layer
@@ -160,8 +164,8 @@ class MLP:
                                   next_deltas = delta_next_layer,
                                   next_weights= next_hidden_layer.weight_matrix)
 
-        
-
+    
+    # Predicts the target based on rows of input
     def pred(self, rows):
         #Y = []
         #for i in range(rows.shape[0]): 
@@ -170,10 +174,12 @@ class MLP:
         #    Y.append(y)
         return rows.apply(self.pred_row, axis=1)
 
+    # Helper function. Predicts a single row
     def pred_row(self, row):
        return self._forward(row)
         
 
+    # Loss function. This is what we want to minimize
     def loss(self, rows, targ):
         preds = self.pred(rows)
         
@@ -181,7 +187,7 @@ class MLP:
         #return sum(- targ*(np.log(preds)))
 
         # -[t*ln(y) + (1 - t)ln(1-y)]
-        return sum(-(targ*np.log(preds) + (1-targ)*np.log(preds)))/len(rows)      
+        return sum(-(targ*np.log(preds) + (1-targ)*np.log(1 - preds)))
     
     
     

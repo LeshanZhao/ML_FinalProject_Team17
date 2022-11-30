@@ -34,18 +34,12 @@ class Layer:
         
         self.weight_changes = np.zeros(self.weight_matrix.shape)
         
+    # Does foward direction of mlp.
     def forward(self, layer_input):
         # Gets output of hidden layer based on layer_input
         #self.layer_input = layer_input
         
-        """
-        # If we add bias, we do it another way...
-        output = []
-        
-        if self.bias:
-            output.append(1)
-            
-        """
+
         
         if self.is_input:
             # We just have 1 input per node...
@@ -56,12 +50,11 @@ class Layer:
                 perc  = self.node_list[i]
                 
                 # Putting these a 1 element lists for sake of np.dot
-                output.append(perc.pred(w_i, [layer_input[i]])) #Ternary???
+                output.append(perc.pred(w_i, [layer_input[i]]))
             """
-            # List comprehension. Speed
-            #layer_input = np.vectorize(lambda x: np.array([x]))(layer_input)
-            
+            # List comprehension for speed            
             layer_input = [np.array([lay])for lay in layer_input]
+            
             if self.bias:
                 layer_input.insert(0, np.array([0]))
             return [self.node_list[i].pred(x = layer_input[i], w = self.weight_matrix[i]) for i in range(len(self.node_list))]
@@ -85,7 +78,7 @@ class Layer:
         
 
     
-    # y_train provided only in output layer. delta None if output
+    # y_train provided only in output layer. next_delta = None only if output
     def backward(self, lr, next_deltas = None, next_weights = None, y_train = None):
         ## If output layer... mul_term = (y_train - o_k)
         ## Else: mul_term = sum([next_weights[i][h]*delta[h] for i in range(len(delta))]) 
@@ -103,12 +96,8 @@ class Layer:
                 
                 w_change = lr*np.array(delt)*feature #+ self.prev_weight_change*self.alpha
                 
-                #self.prev_weight_change = w_change
-                '''
-                self.weight_matrix[i][0] += w_change
-                '''
                 self.weight_changes[i] = w_change + self.weight_changes[i]
-            return deltas # No need to return anything... input layer
+            return deltas # No need to return anything... input layer. Will anyways
         """
         for node, delt, weight_list in zip(self.node_list, deltas, self.weight_matrix):
             x_j = node.x_j 
@@ -124,8 +113,11 @@ class Layer:
         # Returns deltas so they can be used for earlier layer back prop
         return deltas
     
-    # Helper function for backward
-    # Calling it for its side effects
+    # Helper function for backward prop
+    # Calling it for its side effects.
+    # Probably should rename. At this point, it doesn't actually alter weights
+    #    It saves what the weight changes should be for later when we want to 
+    #    do the changes
     def alter_weights_non_input(self, lr, weight_max, node, delt, weight_list, i):
         x_j = node.x_j 
         
@@ -143,20 +135,20 @@ class Layer:
             
     # TODO: I am making it determine the weight changes for multiple inputs
     # then changing the list of weights afterwards.
-
-    def update_weight_matrix(self):
+    def do_weight_change(self):
         self.weight_matrix = self.weight_matrix + self.weight_changes
         self.weight_changes = np.zeros(self.weight_matrix.shape)
-    
     
     def compute_deltas(self, next_deltas = None, next_weights = None, y_train = None):
         # Output layer case
         if not(y_train is None):
             node = self.node_list[0]
-            o_k = node.output # Needs to be threshold?
+            o_k = node.output # Sigmoid output
             
+            # Determined by derivated of loss function
+            mul_term = ((y_train)/o_k - (1-y_train)/(1 - o_k))
             
-            mul_term = ( (y_train)/o_k - (1-y_train)/(1-o_k))
+            mul_term = ((y_train)/o_k - (1-y_train)/(1-o_k))
 
             #if o_k >= .5:
             #    mul_term = (y_train - 1)
@@ -169,20 +161,6 @@ class Layer:
             # returning list of deltas
             return [d_k]
             
-        """
-        # Otherwise we are input or hidden layer. These nodes need future info...
-        d_k_list = []
-        
-        for h in range(len(self.node_list)):
-            node = self.node_list[h]
-            mul_term = sum([next_weights[k][h] * next_deltas[k] for k in range(len(next_deltas))])
-            
-            d_k = self.compute_delta_helper(node, mul_term)
-            
-            # TODO remove append for efficiency
-            d_k_list.append(d_k)
-        return d_k_list
-        """
         
         return [self.compute_delta_helper_vec(h, next_weights, next_deltas) for h in range(len(self.node_list))]
         
@@ -201,10 +179,13 @@ class Layer:
         delta_k = o_k * (1 - o_k) * mul_term
         return delta_k
     
+    # Used in init to create the list of perceptrons in the layer.
     def build_percepton_list(self, num_perceptrons, num_inputs):
         build_perc = (lambda i: neural_node.Neural_Node(size = num_inputs, func = lambda y: 1) if (i == 0 and self.bias) else neural_node.Neural_Node(size = num_inputs))
         return [build_perc(i) for i in range(num_perceptrons)]
         
+    # Builds weight matrix. 
+    # These weights go into the perceptrons of the perceptron list
     def build_weight_matrix(self, num_perceptrons, num_inputs):
         weights = []
         
