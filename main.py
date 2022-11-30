@@ -233,30 +233,35 @@ size = 13
 
 bs = 25
 
-X0 = X_train[np.logical_and(y_train == 0, np.logical_and(X_train["active"] == 0, X_train["smoke"] == 1))].head(50) #[y_train == 0]
-y0 = y_train[np.logical_and(y_train == 0, np.logical_and(X_train["active"] == 0, X_train["smoke"] == 1))].head(50)
+X0 = X_train[np.logical_and(y_train == 0, np.logical_and(X_train["active"] == 0, X_train["smoke"] == 1))].head(7) #[y_train == 0]
+y0 = y_train[np.logical_and(y_train == 0, np.logical_and(X_train["active"] == 0, X_train["smoke"] == 1))].head(7)
 
 
-X1 = X_train[np.logical_and(y_train == 1, np.logical_and(X_train["active"] == 1, X_train["smoke"] == 0))].head(50) #[y_train == 0]
-y1 = y_train[np.logical_and(y_train == 1, np.logical_and(X_train["active"] == 1, X_train["smoke"] == 0))].head(50)
+X1 = X_train[np.logical_and(y_train == 1, np.logical_and(X_train["active"] == 1, X_train["smoke"] == 0))].head(10) #[y_train == 0]
+y1 = y_train[np.logical_and(y_train == 1, np.logical_and(X_train["active"] == 1, X_train["smoke"] == 0))].head(10)
 
 Xc = pd.concat([X0, X1])
 yc = pd.concat([y0, y1])
 
-X_try = X_train.head(1200).tail(100)
-y_try = y_train.head(1200).tail(100)
+X_try = X_train.head(1000).tail(20)
+y_try = y_train.head(1000).tail(20)
 
-#Xc = X_try
-#yc = y_try
+Xc = X_try
+yc = y_try
 
-lr = .001
+#Xc = X1
+#yc = y1
+
+#Xc = Xc[["active", "smoke"]]
+
+lr = .05
 
 #my_little_perceptron.print_network()
 
 
-#my_new_perceptron = mlp.MLP(num_features = 2, num_hidden_layers = 1, hidden_sizes = [6], include_bias = True)
+#my_new_perceptron = mlp.MLP(num_features = 2, num_hidden_layers = 1, hidden_sizes = [2], include_bias = True)
 
-my_new_perceptron = mlp.MLP(num_features = size, num_hidden_layers = 1, hidden_sizes = [8], include_bias = True)
+my_new_perceptron = mlp.MLP(num_features = size, num_hidden_layers = 1, hidden_sizes = [8], include_bias = False)
 '''
 my_new_perceptron.train(X_try, y_try, epochs  = 100, lr = lr)
 
@@ -275,7 +280,7 @@ print(get_acc(out2, y_try))
 '''
 #[["smoke", "active"]]
 loss_vec = []
-n = 50
+n = 20
 num_epochs = range(n)
 
 for i in range(n):
