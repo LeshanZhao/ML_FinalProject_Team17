@@ -6,6 +6,7 @@ Created on Thu Nov 10 10:55:12 2022
 """
 from perceptron import Perceptron
 from layer import Layer
+import numpy as np
 
 class MLP:
     def dep__init__(self, 
@@ -176,8 +177,11 @@ class MLP:
     def loss(self, rows, targ):
         preds = self.pred(rows)
         
-        return sum((preds - targ)**2)
-        
+        #return sum((preds - targ)**2)
+        #return sum(- targ*(np.log(preds)))
+
+        # -[t*ln(y) + (1 - t)ln(1-y)]
+        return sum(-(targ*np.log(preds) + (1-targ)*np.log(preds)))/len(rows)      
     
     
     

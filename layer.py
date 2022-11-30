@@ -153,8 +153,8 @@ class Layer:
             node = self.node_list[0]
             o_k = node.output # Needs to be threshold?
             
-            # Going to use threshold only here to see if progress...
-            mul_term = (y_train - o_k)
+            
+            mul_term = ((y_train)/o_k - (1-y_train)/(1-o_k))
 
             #if o_k >= .5:
             #    mul_term = (y_train - 1)
