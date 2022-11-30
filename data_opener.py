@@ -25,6 +25,7 @@ def train_test_val_split(data, target = "cardio"):
 
     return X_train, X_test, X_val, y_train, y_test, y_val
 
+
 def get_data(filename = "cardio_train.csv"):
     df = pd.read_csv(filename, sep = ";")
     
