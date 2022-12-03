@@ -87,7 +87,7 @@ class MLP:
         # Uses lexical scoping and list comprehensions.
         # Right now, batch size unused. Still have overhead here, but better than before
         func_series = X.apply(lambda row: (lambda y: self.train_row(row, y, lr)), axis=1)
-        losses = [func_series.iloc[i](y.iloc[i]) for i in range(len(y))]
+        losses = sum([func_series.iloc[i](y.iloc[i]) for i in range(len(y))])
         
         # After doing all the rows in the batch, alter weights...
         # Rather than alter weights every time.
