@@ -8,11 +8,11 @@ import numpy as np
 import pandas as pd
 
 class cross_validation: 
-    def __init__(self, dataset) -> None:
+    def __init__(self, dataset = []) -> None:
         self.dataset = dataset
         #split the dataset columns to features and label column
-        self.y = dataset.iloc[:,[-1]]
-        self.X = dataset.drop(self.y,axis = 1)
+        # self.y = dataset.iloc[:,[-1]]
+        # self.X = dataset.drop(self.y,axis = 1)
 
     def train_test_split(self, features, targ, test_size=0.2):
         #find the train percentage
@@ -53,7 +53,7 @@ class cross_validation:
         FalsePostive = []
         TrueNegative = []
         FalseNegative = []
-        for y, y_ in y_test, y_pred: 
+        for y, y_ in zip(y_test, y_pred): 
             if y == 1 and y_==1:
                 TruePostive.append(y)
             elif y == 0 and y_ == 0:
@@ -67,17 +67,28 @@ class cross_validation:
         FP = len(FalsePostive)
         TN = len(TrueNegative)
         FN = len(FalseNegative)
+        
+        print("\t\t", "Positive\t", "Negative\t\n")
+        print("pred_posi\t", TP, "\t\t", FP, "\t\n")
+        print("pred_nega\t", FN, "\t\t", TN, "\t\n")
 
         Precision = TP / (TP + FP)
         Recall = TP / (TP + FN)
         Accuracy = (TP + TN) / (TP + TN + FP + FN)
         ErrorRate = 1 - Accuracy
+        print("Accuracy:", Accuracy)
+        print("ErrorRate:", ErrorRate)
+        print("Precision:", Precision)
+        print("Recall:", Recall)
         return Precision, Recall, Accuracy, ErrorRate
 
-def cross_val_score(self, cv=2, shuffle=True): 
-        if shuffle == True: 
-            folds = self.Kfold(cv, shuffle)
-        conf_matrix = [] 
-        for fold in folds: 
-            conf_matrix.append(self.confusion_matrix())
-        return conf_matrix
+    def cross_val_score(self, cv=2, shuffle=True): 
+            if shuffle == True: 
+                folds = self.Kfold(cv, shuffle)
+            conf_matrix = [] 
+            for fold in folds: 
+                conf_matrix.append(self.confusion_matrix())
+            return conf_matrix
+
+cv = cross_validation()
+cv.confusion_matrix([1,1,1,0,0,0], [1,1,0,1,0,0])
