@@ -21,13 +21,14 @@ import matplotlib.pyplot as plt
 def get_acc(pred, y):
     return (1 - np.sum(abs(np.array(y) - np.array(pred))) / len(y)) * 100
 
-'''
+
 ob = cProfile.Profile()
 ob.enable()
-'''
+#'''
 
 random.seed(12321)
 
+"""
 data = data_opener.get_data()
 
 # Max corr is .5, so correlation not going to be used for feature selection
@@ -40,7 +41,7 @@ X_train, X_test, X_val, y_train, y_test, y_val = data_opener.train_test_val_spli
 size = 13
 h_num = 2000
 care_for = 20
-
+#"""
 # Running on top 2000 rows currently, just to save time with debugging
 """
 # TODO: Test NN functionality
@@ -243,8 +244,8 @@ y1 = y_train[np.logical_and(y_train == 1, np.logical_and(X_train["active"] == 1,
 Xc = pd.concat([X0, X1])
 yc = pd.concat([y0, y1])
 
-X_try = X_train.head(100).tail(100)
-y_try = y_train.head(100).tail(100)
+X_try = X_train
+y_try = y_train
 
 Xc = X_try
 yc = y_try
@@ -259,9 +260,9 @@ lr = .05
 #my_little_perceptron.print_network()
 
 
-#my_new_perceptron = mlp.MLP(num_features = 2, num_hidden_layers = 1, hidden_sizes = [2], include_bias = True)
-
-my_new_perceptron = mlp.MLP(num_features = size, num_hidden_layers = 1, hidden_sizes = [8], include_bias = False)
+#my_new_perceptron = mlp.MLP(num_features = size, num_hidden_layers = 2, hidden_sizes = [12, 6], include_bias = True)
+#
+#my_new_perceptron = mlp.MLP(num_features = size, num_hidden_layers = 1, hidden_sizes = [8], include_bias = True)
 '''
 my_new_perceptron.train(X_try, y_try, epochs  = 100, lr = lr)
 
@@ -280,40 +281,46 @@ print(get_acc(out2, y_try))
 '''
 #[["smoke", "active"]]
 loss_vec = []
-n = 20
+n = 1000
 num_epochs = range(n)
 
-for i in range(n):
-    out = my_new_perceptron.train(Xc, yc, epochs  = 1, lr = lr)
-    losses = my_new_perceptron.loss(Xc, yc)
-    #print(losses)
-    loss_vec.append(losses)
+#for i in range(n):
+#my_new_perceptron.train(Xc, yc, epochs  = n, lr = lr)
+#    losses = my_new_perceptron.loss(Xc, yc)
+#    #print(losses)
+#    loss_vec.append(losses)
 
-plt.plot(num_epochs, loss_vec)
+#plt.plot(num_epochs, loss_vec)
 out = my_new_perceptron.pred(Xc) 
 
 
 out2 = list(map(lambda x: 1 if x >= .5 else 0, out))
 
-for o, y_i in zip(out, yc):
-    print(str(o), "", str(y_i))
+#for o, y_i in zip(out, yc):
+#   print(str(o), "", str(y_i))
 
 
-losses = my_new_perceptron.loss(Xc, yc)
+#losses = my_new_perceptron.loss(Xc, yc)
     
 print("Accuracy:", get_acc(out2, yc))
 
+
+out = my_new_perceptron.pred(X_test) 
+out2 = list(map(lambda x: 1 if x >= .5 else 0, out))
+print("Accuracy:", get_acc(out2, y_test))
+
+
 #'''
-'''
+
 ob.disable()
 sec = io.StringIO()
 sortby = SortKey.CUMULATIVE
 ps = pstats.Stats(ob, stream=sec).sort_stats("tottime")
 ps.print_stats(15)
 ps = pstats.Stats(ob, stream=sec).sort_stats("cumtime")
-ps.print_stats(20)
+ps.print_stats(30)
 
 
 print(sec.getvalue())
-'''
+#'''
 

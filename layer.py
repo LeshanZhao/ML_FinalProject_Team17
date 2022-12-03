@@ -89,6 +89,7 @@ class Layer:
         
         
         if self.is_input:
+            """
             for i in range(len(self.node_list)):
                 node = self.node_list[i]
                 delt = deltas[i]
@@ -97,6 +98,9 @@ class Layer:
                 w_change = lr*np.array(delt)*feature #+ self.prev_weight_change*self.alpha
                 
                 self.weight_changes[i] = w_change + self.weight_changes[i]
+            """
+            # List comprehension for speed. Leaving for loop as comment for clarity
+            self.weight_changes = [self.weight_changes[i] + lr*np.array(deltas[i])*(self.node_list[i].x_j[0]) for i in range(len(self.node_list))]
             return deltas # No need to return anything... input layer. Will anyways
         """
         for node, delt, weight_list in zip(self.node_list, deltas, self.weight_matrix):
@@ -119,11 +123,10 @@ class Layer:
     #    It saves what the weight changes should be for later when we want to 
     #    do the changes
     def alter_weights_non_input(self, lr, weight_max, node, delt, weight_list, i):
+        
         x_j = node.x_j 
-        
         w_change = lr*np.array(delt)*np.array(x_j) #+ self.prev_weight_change*self.alpha
-        
-        self.weight_changes = np.array(w_change) + self.weight_changes
+        self.weight_changes += np.array(w_change)
         #self.prev_weight_change = w_change
         '''
         # This will change weight matrix via mutation. Slow though
@@ -155,13 +158,13 @@ class Layer:
             # returning list of deltas
             return [d_k]
             
-        
         return [self.compute_delta_helper_vec(h, next_weights, next_deltas) for h in range(len(self.node_list))]
         
         
     def compute_delta_helper_vec(self, h, next_weights, next_deltas):
         node = self.node_list[h]
-        mul_term = sum([next_weights[k][h] * next_deltas[k] for k in range(len(next_deltas))])
+        #mul_term = sum([next_weights[k][h] * next_deltas[k] for k in range(len(next_deltas))])
+        mul_term = np.dot(np.transpose(next_weights)[h], next_deltas)
         o_k = node.output
         
         # Return d_k

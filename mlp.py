@@ -27,6 +27,7 @@ class MLP:
         self.num_features = num_features
         self.lr = lr
         self.n_epochs = n_epochs
+        self.losses = []
         
         bias = (1 if include_bias else 0)
 
@@ -86,16 +87,19 @@ class MLP:
         # Uses lexical scoping and list comprehensions.
         # Right now, batch size unused. Still have overhead here, but better than before
         func_series = X.apply(lambda row: (lambda y: self.train_row(row, y, lr)), axis=1)
-        [func_series.iloc[i](y.iloc[i]) for i in range(len(y))]
+        losses = [func_series.iloc[i](y.iloc[i]) for i in range(len(y))]
         
         # After doing all the rows in the batch, alter weights...
         # Rather than alter weights every time.
         self.do_weight_changes()
+        
+        self.losses.append(losses)
     
     def train_row(self, row, y_targ, lr = None):
-        self._forward(row)
+        loss = self._forward(row)
         self._backward(y_targ, lr)
         
+        return loss
         # This line uncommented makes it do stochastic grad descent instead
         #self.do_weight_changes()
         
