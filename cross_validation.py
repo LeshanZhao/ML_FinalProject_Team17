@@ -8,11 +8,12 @@ import numpy as np
 import pandas as pd
 
 class cross_validation: 
-    def __init__(self, dataset) -> None:
-        self.dataset = dataset
+    def __init__(self, dataset = None) -> None:
         #split the dataset columns to features and label column
-        self.y = dataset.iloc[:,[-1]]
-        self.X = dataset.drop(self.y,axis = 1)
+        if not dataset is None:
+            self.dataset = dataset
+            self.y = dataset.iloc[:,[-1]]
+            self.X = dataset.drop(self.y,axis = 1)
         
         self.precision = 0
         self.recall = 0 
@@ -62,11 +63,13 @@ class cross_validation:
             if y == 1 and y_==1:
                 TruePostive.append(y)
             elif y == 1 and y_ == 0:
-                FalsePostive.append(y)
+                # FalsePostive.append(y)  # should be FN!
+                FalseNegative.append(y)
             elif y == 0 and y_ == 0:
                 TrueNegative.append(y)
             elif y == 0 and y_ == 1:
-                FalseNegative.append(y)
+                # FalseNegative.append(y)  # should be FP!
+                FalsePostive.append(y)  # should be FP!
         
         TP = len(TruePostive)
         FP = len(FalsePostive)
@@ -86,17 +89,26 @@ class cross_validation:
             if y == 1 and y_==1:
                 TruePostive.append(y)
             elif y == 1 and y_ == 0:
-                FalsePostive.append(y)
+                # FalsePostive.append(y)  # should be FN!
+                FalseNegative.append(y)
             elif y == 0 and y_ == 0:
                 TrueNegative.append(y)
             elif y == 0 and y_ == 1:
-                FalseNegative.append(y)
+                # FalseNegative.append(y)  # should be FP!
+                FalsePostive.append(y)  # should be FP!
         
         TP = len(TruePostive)
         FP = len(FalsePostive)
         TN = len(TrueNegative)
         FN = len(FalseNegative)
         
+        matrix = "\t\t" + "Positive\t" + "Negative\t\n" + \
+            "pred_pos\t" + str(TP) + "\t\t" + str(FP) + "\t\n" \
+            "pred_neg\t" + str(FN) + "\t\t" + str(TN) + "\t\n"
+        # print("\t\t", "Positive\t", "Negative\t\n")
+        # print("pred_posi\t", TP, "\t\t", FP, "\t\n")
+        # print("pred_nega\t", FN, "\t\t", TN, "\t\n")
+
         size = len(y_test)
         
         if TP + FP == 0:
@@ -126,3 +138,44 @@ class cross_validation:
         for fold in folds:
             conf_matrix.append(self.confusion_matrix())
         return conf_matrix
+
+    def print_stat(self, y_test, y_pred): #done!!
+        TruePostive = []
+        FalsePostive = []
+        TrueNegative = []
+        FalseNegative = []
+        for y, y_ in zip(y_test, y_pred): 
+            if y == 1 and y_==1:
+                TruePostive.append(y)
+            elif y == 1 and y_ == 0:
+                FalseNegative.append(y)  # should be FN!
+            elif y == 0 and y_ == 0:
+                TrueNegative.append(y)
+            elif y == 0 and y_ == 1:
+                FalsePostive.append(y)  # should be FP!
+        
+        TP = len(TruePostive)
+        FP = len(FalsePostive)
+        TN = len(TrueNegative)
+        FN = len(FalseNegative)
+        
+        Precision = TP / (TP + FP) if (TP + FP != 0) else 0
+        Recall = TP / (TP + FN) if (TP + FN != 0) else 0
+        Accuracy = (TP + TN) / (TP + TN + FP + FN)
+        ErrorRate = 1 - Accuracy
+
+        metrics = "Accuracy:\t" + str(Accuracy) + "\n" + \
+            "ErrorRate:\t" + str(ErrorRate) + "\n" + \
+            "Precision:\t" + str(Precision) + "\n" + \
+            "Recall:\t" + str(Recall) + "\n"
+
+
+        Matrix = "Confusion matrix:\n" + \
+            "\t\t\t" + "Positive\t" + "Negative\t\n" + \
+            "pred_pos\t" + str(TP) + "\t\t\t" + str(FP) + "\t\n" \
+            "pred_neg\t" + str(FN) + "\t\t\t" + str(TN) + "\t\n"
+
+        # print("\t\t", "Positive\t", "Negative\t\n")
+        # print("pred_posi\t", TP, "\t\t", FP, "\t\n")
+        # print("pred_nega\t", FN, "\t\t", TN, "\t\n")
+        return [metrics, Matrix]
