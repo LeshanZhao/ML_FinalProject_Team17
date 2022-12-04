@@ -13,6 +13,11 @@ class cross_validation:
         #split the dataset columns to features and label column
         self.y = dataset.iloc[:,[-1]]
         self.X = dataset.drop(self.y,axis = 1)
+        
+        self.precision = 0
+        self.recall = 0 
+        self.accuracy = 0
+        self.error = 0 
 
     def train_test_split(self, features, targ, test_size=0.2):
         #find the train percentage
@@ -31,7 +36,7 @@ class cross_validation:
 
     def createFold(self, start_index, fold_size):
         lastIndex = start_index + fold_size
-        return self.dataset.iloc[start_index:lastIndex, :] #slice the fold from the start index to fold size bu added the fold size ti index to see the last index in fold
+        return self.dataset.iloc[int(start_index):int(lastIndex), :] #slice the fold from the start index to fold size bu added the fold size ti index to see the last index in fold
 
     def Kfold (self, n_splits, shuffle = True):
         # Use n_splits to consider the number of folds 
@@ -41,7 +46,7 @@ class cross_validation:
         # The 2nd Fold from 1 * 50 until (1 * 50 + 50 )  
         fold_size = len(self.dataset)/n_splits
         folds = [] 
-        for i in n_splits:
+        for i in range(n_splits):
             if shuffle == True: 
                 self.dataset = self.dataset.sample(frac = 1)
             folds.append(self.createFold(i*fold_size, fold_size))
@@ -56,9 +61,9 @@ class cross_validation:
         for y, y_ in zip(y_test, y_pred): 
             if y == 1 and y_==1:
                 TruePostive.append(y)
-            elif y == 0 and y_ == 0:
-                FalsePostive.append(y)
             elif y == 1 and y_ == 0:
+                FalsePostive.append(y)
+            elif y == 0 and y_ == 0:
                 TrueNegative.append(y)
             elif y == 0 and y_ == 1:
                 FalseNegative.append(y)
@@ -67,17 +72,57 @@ class cross_validation:
         FP = len(FalsePostive)
         TN = len(TrueNegative)
         FN = len(FalseNegative)
+        
+        size = len(y_test)
+        
+        return TP/size, FP/size, FN/size, TN/size
 
-        Precision = TP / (TP + FP)
-        Recall = TP / (TP + FN)
+    def add_metrics(self, fold_nums, y_pred, y_test):
+        TruePostive = []
+        FalsePostive = []
+        TrueNegative = []
+        FalseNegative = []
+        for y, y_ in zip(y_test, y_pred): 
+            if y == 1 and y_==1:
+                TruePostive.append(y)
+            elif y == 1 and y_ == 0:
+                FalsePostive.append(y)
+            elif y == 0 and y_ == 0:
+                TrueNegative.append(y)
+            elif y == 0 and y_ == 1:
+                FalseNegative.append(y)
+        
+        TP = len(TruePostive)
+        FP = len(FalsePostive)
+        TN = len(TrueNegative)
+        FN = len(FalseNegative)
+        
+        size = len(y_test)
+        
+        if TP + FP == 0:
+            Precision = 0
+        else:
+            Precision = TP / (TP + FP)
+            
+        if (TP + FN) == 0:
+            Recall = 0
+        else:
+            Recall = TP / (TP + FN)
+        
         Accuracy = (TP + TN) / (TP + TN + FP + FN)
         ErrorRate = 1 - Accuracy
-        return Precision, Recall, Accuracy, ErrorRate
+        
 
-def cross_val_score(self, cv=2, shuffle=True): 
+        self.precision += Precision/fold_nums
+        self.recall += Recall/fold_nums
+        self.accuracy += Accuracy/fold_nums
+        self.error += ErrorRate/fold_nums
+        
+        
+    def cross_val_score(self, cv=2, shuffle=True): 
         if shuffle == True: 
             folds = self.Kfold(cv, shuffle)
         conf_matrix = [] 
-        for fold in folds: 
+        for fold in folds:
             conf_matrix.append(self.confusion_matrix())
         return conf_matrix

@@ -9,20 +9,6 @@ from layer import Layer
 import numpy as np
 
 class MLP:
-    def dep__init__(self, 
-                #Input_Layer: Layer, 
-                #Output_Layer: Layer,
-                #Hidden_Layers: list[Layer],
-                X,
-                y):
-        # TODO: instead of passing in layers, tell it how many layers and what sizes
-        # We should build the layers here
-        
-        self.input_layer = Input_Layer
-        self.output_layer = Output_Layer
-        self.hidden_layers = Hidden_Layers
-        self.X = X # TODO no need to initialize X and Y
-        self.y = y
 
     # TODO: Write the init function to take these parameters
     def __init__(self, 
@@ -41,6 +27,7 @@ class MLP:
         self.num_features = num_features
         self.lr = lr
         self.n_epochs = n_epochs
+        self.losses = []
         
         bias = (1 if include_bias else 0)
 
@@ -100,16 +87,19 @@ class MLP:
         # Uses lexical scoping and list comprehensions.
         # Right now, batch size unused. Still have overhead here, but better than before
         func_series = X.apply(lambda row: (lambda y: self.train_row(row, y, lr)), axis=1)
-        [func_series.iloc[i](y.iloc[i]) for i in range(len(y))]
+        losses = sum([func_series.iloc[i](y.iloc[i]) for i in range(len(y))])
         
         # After doing all the rows in the batch, alter weights...
         # Rather than alter weights every time.
         self.do_weight_changes()
+        
+        self.losses.append(losses)
     
     def train_row(self, row, y_targ, lr = None):
-        self._forward(row)
+        loss = self._forward(row)
         self._backward(y_targ, lr)
         
+        return loss
         # This line uncommented makes it do stochastic grad descent instead
         #self.do_weight_changes()
         
