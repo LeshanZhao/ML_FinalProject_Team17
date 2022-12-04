@@ -38,7 +38,7 @@ class cross_validation:
         lastIndex = start_index + fold_size
         return self.dataset.iloc[int(start_index):int(lastIndex), :] #slice the fold from the start index to fold size bu added the fold size ti index to see the last index in fold
 
-    def Kfold (self, n_splits, shuffle = True):
+    def Kfold(self, n_splits, shuffle = True):
         # Use n_splits to consider the number of folds 
         # Create each fold from the data starting from index i*fold_size until (i * fold_size + fold_size)
         # For Ex: fold_size is 50 

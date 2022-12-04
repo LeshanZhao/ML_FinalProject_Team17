@@ -51,7 +51,7 @@ for i in range(splits):
             y_train = pd.concat([y_train, folds[i][targ_name]])
         
     # Do stuff with x_train and y_train...
-    neural_net = mlp.MLP(num_features = size, num_hidden_layers = 1, hidden_sizes = [8], include_bias = True)
+    neural_net = mlp.MLP(n_features = size, hidden_sizes = [8], include_bias = True)
     
     print("Started train")
     neural_net.train(x_train, y_train, epochs  = num_epochs, lr = lr)
