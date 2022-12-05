@@ -11,15 +11,14 @@ import data_opener
 import mlp
 import matplotlib.pyplot as plt
 from cross_validation import cross_validation
-
+import random
 cv = cross_validation()
 
 
 def get_acc(pred, y):
     return (1 - np.sum(abs(np.array(y) - np.array(pred))) / len(y)) * 100
 
-
-# random.seed(12321)
+random.seed(8313)
 
 data = data_opener.get_data()
 # Max corr is .5, so correlation not going to be used for feature selection
@@ -28,16 +27,16 @@ corr_matrix = data.corr()
 X_train, X_test, X_val, y_train, y_test, y_val = data_opener.train_test_val_split(data)
 
 
-n_samples = 10000
+n_samples = 6000
 
 X_train = X_train.head(n_samples)
 y_train = y_train.head(n_samples)
 # print(X_train.iloc[0])
 
 n_features = 13
-lr = .00001
+lr = .00010
 n_epochs = 200
-batch_size = 25
+#batch_size = 25
 
 output_path = "output/" + \
                 "lr" + str(lr) + "_" + \
@@ -58,12 +57,12 @@ print("\n\n=============== Start training... ===============\n", file = result_f
 print("sample size: ", n_samples, file = result_file)
 print("lr: ", lr, file = result_file)
 print("n_epochs: ", n_epochs, file = result_file)
-print("batch_size: ", batch_size, file = result_file)
+#print("batch_size: ", batch_size, file = result_file)
 
 mlp_clf = mlp.MLP(n_features = n_features, 
                     hidden_sizes = [8], 
                     n_epochs = n_epochs,
-                    batch_size = batch_size,
+                    #batch_size = batch_size,
                     include_bias = True)
 
 mlp_clf.train(X_train, y_train, lr = lr)
