@@ -8,7 +8,6 @@ Created on Tue Nov  8 17:50:10 2022
 import numpy as np
 import pandas as pd
 import data_opener
-import random
 import mlp
 import matplotlib.pyplot as plt
 from cross_validation import cross_validation
