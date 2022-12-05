@@ -18,7 +18,7 @@ class Layer:
         self.bias = include_bias
         self.is_input = is_input_layer
         self.prev_weight_change = 0
-        self.alpha = .25
+        self.alpha = .25 # No longer used because we stopped using momentum
         bias = (1 if self.bias else 0)
         
         

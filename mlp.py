@@ -15,7 +15,6 @@ class MLP:
                 hidden_sizes, 
                 n_epochs = 1, 
                 lr = 1,
-                batch_size = 25,
                 include_bias = False):
         # num_features is number of features we will have. Size of input layer
         # num_hidden_layers = number of hidden layers we will have
@@ -27,7 +26,6 @@ class MLP:
         self.n_hidden_layers = len(hidden_sizes)
         self.n_epochs = n_epochs
         self.lr = lr
-        self.batch_size = batch_size
         self.losses = []
         
         # initialize input layer
@@ -65,7 +63,7 @@ class MLP:
                 print("\tweights: " + str(layer.weight_matrix[j]))
 
     # Public method 1: used to fit the model with data (X, y)
-    def train(self, X, y, lr = None, batch_size = 25, epochs = None):
+    def train(self, X, y, lr = None, epochs = None):
         if epochs is None:
             epochs = self.n_epochs
         [self._train_df(X, y, lr) for e in range(epochs)]
