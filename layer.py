@@ -80,7 +80,6 @@ class Layer:
         ## If output layer... mul_term = (y_train - o_k)
         ## Else: mul_term = sum([next_weights[i][h]*delta[h] for i in range(len(delta))]) 
         # TODO: Remove overhead. This is most inefficient function as far as I can tell
-        weight_max = 50
         
         deltas = self._compute_deltas(next_deltas, next_weights, y_train)
         
@@ -110,7 +109,7 @@ class Layer:
                     continue
                 weight_list[i] += w_change[i]
         """
-        [self._alter_weights_non_input(lr, weight_max, self.node_list[i], deltas[i], self.weight_matrix[i], i) for i in range(len(deltas))]
+        [self._alter_weights_non_input(lr, self.node_list[i], deltas[i], self.weight_matrix[i]) for i in range(len(deltas))]
         # Returns deltas so they can be used for earlier layer back prop
         return deltas
     
@@ -119,7 +118,7 @@ class Layer:
     # Probably should rename. At this point, it doesn't actually alter weights
     #    It saves what the weight changes should be for later when we want to 
     #    do the changes
-    def _alter_weights_non_input(self, lr, weight_max, node, delt, weight_list, i):
+    def _alter_weights_non_input(self, lr, node, delt, weight_list):
         
         x_j = node.x_j 
         w_change = lr*np.array(delt)*np.array(x_j) #+ self.prev_weight_change*self.alpha
@@ -135,8 +134,9 @@ class Layer:
             
     # TODO: I am making it determine the weight changes for multiple inputs
     # then changing the list of weights afterwards.
-    def _do_weight_change(self):
-        self.weight_matrix = self.weight_matrix + self.weight_changes
+    def _do_weight_change(self, size = 1):
+        w_delt = list(map(lambda x: x/size, self.weight_changes))
+        self.weight_matrix = self.weight_matrix + w_delt
         self.weight_changes = np.zeros(self.weight_matrix.shape)
     
     def _compute_deltas(self, next_deltas = None, next_weights = None, y_train = None):
@@ -146,7 +146,7 @@ class Layer:
             o_k = node.output # Sigmoid output
             
             # Determined by derivated of loss function
-            mul_term = ((y_train)/o_k - (1-y_train)/(1 - o_k))
+            #mul_term = ((y_train)/o_k - (1-y_train)/(1 - o_k))
             
             mul_term = ((y_train)/o_k - (1-y_train)/(1-o_k))
 

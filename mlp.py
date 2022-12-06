@@ -83,28 +83,28 @@ class MLP:
         # Right now, batch size unused. Still have overhead here, but better than before
         func_series = X.apply(lambda row: (lambda y: self._train_row(row, y, lr)), axis=1)
         [func_series.iloc[i](y.iloc[i]) for i in range(len(y))]
+
         losses = self._loss(X, y)
+        self.losses.append(losses)
         
         # After doing all the rows in the batch, alter weights...
         # Rather than alter weights every time.
-        self._do_weight_changes()
-        
-        self.losses.append(losses)
+        self._do_weight_changes(len(y))
     
     def _train_row(self, row, y_targ, lr = None):
-        loss = self._forward(row)
+        pred = self._forward(row)
         self._backward(y_targ, lr)
         
-        return loss
+        return pred
         # This line uncommented makes it do stochastic grad descent instead
         #self.do_weight_changes()
         
-    def _do_weight_changes(self):
-        self.input_layer._do_weight_change()
-        self.output_layer._do_weight_change()
+    def _do_weight_changes(self, size = 1):
+        self.input_layer._do_weight_change(size)
+        self.output_layer._do_weight_change(size)
         
         for layer in self.hidden_layers:
-            layer._do_weight_change()
+            layer._do_weight_change(size)
 
     def _forward(self,row):
         # get output from input layer
@@ -135,7 +135,7 @@ class MLP:
 
         delta_next_layer = self.output_layer.backward(lr, 
                                                       y_train = targ_y)
-        next_hidden_layer = self.output_layer
+        next_layer = self.output_layer
         
         # TODO: Remove for loop overhead? 
         for i in range(len(self.hidden_layers)-1, -1, -1):
@@ -143,12 +143,12 @@ class MLP:
             current_hidden_layer = self.hidden_layers[i]
             delta_next_layer = current_hidden_layer.backward(lr, 
                                                         next_deltas = delta_next_layer,
-                                                        next_weights = next_hidden_layer.weight_matrix)
-            next_hidden_layer = current_hidden_layer
+                                                        next_weights = next_layer.weight_matrix)
+            next_layer = current_hidden_layer
         
         self.input_layer.backward(lr,
                                   next_deltas = delta_next_layer,
-                                  next_weights= next_hidden_layer.weight_matrix)
+                                  next_weights= next_layer.weight_matrix)
 
     
     # Public method 2: Predicts the target based on rows of input

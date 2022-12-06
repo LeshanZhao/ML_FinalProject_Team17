@@ -34,7 +34,7 @@ y_train = y_train.head(n_samples)
 # print(X_train.iloc[0])
 
 n_features = 13
-lr = .00010
+lr = .5
 n_epochs = 200
 #batch_size = 25
 
