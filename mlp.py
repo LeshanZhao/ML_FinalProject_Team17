@@ -63,10 +63,10 @@ class MLP:
                 print("\tweights: " + str(layer.weight_matrix[j]))
 
     # Public method 1: used to fit the model with data (X, y)
-    def train(self, X, y, lr = None, epochs = None):
+    def train(self, X, y, lr = None, epochs = None, stochastic = False):
         if epochs is None:
             epochs = self.n_epochs
-        [self._train_df(X, y, lr) for e in range(epochs)]
+        [self._train_df(X, y, stochastic, lr) for e in range(epochs)]
                 
         """
         for i in range(int(X.shape[0]/batch_size)):
@@ -78,10 +78,10 @@ class MLP:
                     self.train_row(row, y_targ, lr)
         """
         
-    def _train_df(self, X, y, lr):
+    def _train_df(self, X, y, stochastic, lr):
         # Uses lexical scoping and list comprehensions.
         # Right now, batch size unused. Still have overhead here, but better than before
-        func_series = X.apply(lambda row: (lambda y: self._train_row(row, y, lr)), axis=1)
+        func_series = X.apply(lambda row: (lambda y: self._train_row(row, y, stochastic, lr)), axis=1)
         [func_series.iloc[i](y.iloc[i]) for i in range(len(y))]
 
         losses = self._loss(X, y)
@@ -91,13 +91,14 @@ class MLP:
         # Rather than alter weights every time.
         self._do_weight_changes(len(y))
     
-    def _train_row(self, row, y_targ, lr = None):
+    def _train_row(self, row, y_targ, stochastic, lr = None):
         pred = self._forward(row)
         self._backward(y_targ, lr)
+        if stochastic:
+            self.do_weight_changes()
         
         return pred
-        # This line uncommented makes it do stochastic grad descent instead
-        #self.do_weight_changes()
+
         
     def _do_weight_changes(self, size = 1):
         self.input_layer._do_weight_change(size)
@@ -122,10 +123,10 @@ class MLP:
         output_result = y_output_layer_list[0]
         
         return output_result #TODO revert to returning 0 or 1. Returns now to help debug
-        if output_result >= .5:
-            return 1
-        else:
-            return 0
+        #if output_result >= .5:
+        #    return 1
+        #else:
+        #    return 0
         
     
     # Does backward prop for a given row/target
@@ -174,6 +175,10 @@ class MLP:
         # -[t*ln(y) + (1 - t)ln(1-y)]
         return sum(-(targ*np.log(preds) + (1-targ)*np.log(1 - preds)))/len(rows)
     
-    
+    # Returns the predictions of 1's and 0's
+    def predict_ones_and_zeros(self, rows):
+        preds = self.pred(rows)
+        
+        return np.vectorize(lambda val: 1 if (val >= .5) else 0)(preds)
     
     
